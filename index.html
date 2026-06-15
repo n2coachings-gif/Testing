@@ -51,72 +51,32 @@
             overflow-x: hidden;
         }
 
-        /* Header */
+        /* Header & Account */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px 8px;
-            background-color: var(--system-bg);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px 8px; position: sticky; top: 0; z-index: 10; background: var(--system-bg);
         }
-
         h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
-        
-        .add-btn {
-            color: var(--system-blue);
-            font-size: 32px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-        }
+        .add-btn { color: var(--system-blue); font-size: 32px; background: none; border: none; cursor: pointer; padding: 0; }
 
-        /* Account Stats */
         .account-card {
-            margin: 8px 20px 20px;
-            padding: 20px;
+            margin: 8px 20px 20px; padding: 20px;
             background: linear-gradient(135deg, var(--system-blue), #5856D6);
-            border-radius: 18px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            border-radius: 18px; color: white; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
-
-        .account-label { font-size: 15px; opacity: 0.9; margin-bottom: 4px; font-weight: 500;}
+        .account-label { font-size: 15px; opacity: 0.9; margin-bottom: 4px; font-weight: 500; }
         .account-value { font-size: 36px; font-weight: 700; margin: 0; letter-spacing: -1px; }
 
-        /* Calendar Strip */
-        .calendar-wrapper {
-            margin-bottom: 10px;
-        }
-        
+        /* Calendar */
         .calendar-strip {
-            display: flex;
-            overflow-x: auto;
-            padding: 0 20px 10px;
-            gap: 12px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+            display: flex; overflow-x: auto; padding: 0 20px 10px; gap: 12px;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
-        
         .calendar-strip::-webkit-scrollbar { display: none; }
-
         .cal-day {
-            min-width: 60px;
-            padding: 12px 0;
-            border-radius: 16px;
-            background-color: var(--card-bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            scroll-snap-align: center;
-            transition: all 0.2s;
+            min-width: 60px; padding: 12px 0; border-radius: 16px; background-color: var(--card-bg);
+            display: flex; flex-direction: column; align-items: center; scroll-snap-align: center; transition: 0.2s;
         }
-
         .cal-day.active { background-color: var(--text-main); color: var(--system-bg); }
         .cal-day.active .cal-weekday { color: var(--system-bg); opacity: 0.8; }
         .cal-weekday { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
@@ -124,34 +84,44 @@
         .cal-dots { display: flex; gap: 3px; margin-top: 4px; height: 4px; }
         .cal-dot { width: 4px; height: 4px; border-radius: 50%; background-color: var(--system-blue); }
 
-        /* List */
+        /* List & Cards */
         .appointment-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
-
         .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background-color: var(--card-bg); border-radius: 16px; padding: 16px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-
         .card-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .card-time { font-size: 13px; font-weight: 600; color: var(--system-blue); }
         .card-name { font-size: 18px; font-weight: 600; margin: 0; }
         .card-earnings { font-size: 15px; color: var(--text-muted); }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .sheet-modal {
+            background-color: var(--system-bg); width: 100%; border-radius: 18px 18px 0 0;
+            padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .modal-overlay.active .sheet-modal { transform: translateY(0); }
+        .full-modal {
+            background-color: var(--system-bg); width: 100%; height: 100%;
+            padding: 20px; padding-top: calc(20px + env(safe-area-inset-top));
+            transform: translateY(100%); transition: transform 0.3s ease; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .modal-overlay.active .full-modal { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 17px; font-weight: 600; text-align: center; flex: 1; }
+        .modal-btn { background: none; border: none; font-size: 17px; color: var(--system-blue); cursor: pointer; padding: 0; min-width: 80px;}
+        .modal-btn.left { text-align: left; } .modal-btn.right { text-align: right; font-weight: 600; }
 
         /* iOS Toggle Switch */
-        .toggle-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            margin-left: 12px;
-            border-left: 1px solid var(--separator);
-            padding-left: 16px;
-        }
+        .toggle-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-left: 12px; }
         .toggle-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .toggle {
             position: relative; width: 51px; height: 31px; border-radius: 31px;
@@ -165,38 +135,8 @@
         }
         .toggle.active .toggle-knob { transform: translateX(20px); }
 
-        /* Modals (BottomSheet & FullScreen) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-        .sheet-modal {
-            background-color: var(--system-bg); width: 100%; border-radius: 18px 18px 0 0;
-            padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-overlay.active .sheet-modal { transform: translateY(0); }
-
-        .full-modal {
-            background-color: var(--system-bg); width: 100%; height: 100%;
-            padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            transform: translateY(100%); transition: transform 0.3s ease;
-            overflow-y: auto; display: flex; flex-direction: column;
-        }
-        .modal-overlay.active .full-modal { transform: translateY(0); }
-
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { margin: 0; font-size: 17px; font-weight: 600; text-align: center; flex: 1; }
-        .modal-btn { background: none; border: none; font-size: 17px; color: var(--system-blue); cursor: pointer; padding: 0; min-width: 80px;}
-        .modal-btn.left { text-align: left; }
-        .modal-btn.right { text-align: right; font-weight: 600; }
-
-        /* Form Inputs */
-        .form-group { background-color: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+        /* Form Inputs & Autocomplete */
+        .form-group { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 16px; position: relative; }
         .form-row { display: flex; padding: 12px 16px; border-bottom: 0.5px solid var(--separator); align-items: center; }
         .form-row:last-child { border-bottom: none; }
         .form-row label { width: 100px; font-size: 17px; }
@@ -205,27 +145,56 @@
             text-align: right; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
         }
         input[type="date"], input[type="time"] { appearance: none; -webkit-appearance: none; }
-
-        /* Logbook Specifics */
-        .logbook-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
-        .log-row { 
-            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap: 8px; 
-            background: var(--card-bg); padding: 12px; border-radius: 12px; align-items: center;
-        }
-        .log-row input { 
-            width: 100%; border: none; background: var(--system-bg); padding: 8px; 
-            border-radius: 6px; font-size: 15px; text-align: center; color: var(--text-main);
-            -webkit-user-select: auto; user-select: auto;
-        }
-        .log-row input.ex-name { text-align: left; }
-        .log-row .del-btn { color: var(--system-red); background: none; border: none; font-size: 18px; padding: 0; }
         
-        .add-log-btn { 
-            width: 100%; padding: 14px; border-radius: 12px; border: none; 
-            background: var(--card-bg); color: var(--system-blue); font-size: 17px; font-weight: 600; margin-top: 10px;
+        .autocomplete-dropdown {
+            position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg);
+            border-radius: 0 0 12px 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 50; max-height: 150px; overflow-y: auto; display: none;
         }
+        .autocomplete-dropdown.active { display: block; border-top: 0.5px solid var(--separator); }
+        .ac-item { padding: 12px 16px; font-size: 17px; border-bottom: 0.5px solid var(--separator); }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item span { font-size: 13px; color: var(--text-muted); float: right; }
 
-        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
+        /* Smart Logbook */
+        .logbook-list { display: flex; flex-direction: column; gap: 16px; flex: 1; padding-bottom: 40px; }
+        
+        .log-card {
+            background: var(--card-bg); border-radius: 12px; padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px;
+        }
+        
+        .log-header { display: flex; justify-content: space-between; align-items: center; }
+        .log-header input { 
+            font-size: 17px; font-weight: 600; border: none; background: transparent; 
+            color: var(--text-main); outline: none; flex: 1; -webkit-user-select: auto; user-select: auto;
+        }
+        
+        .log-mini-toggle { display: flex; align-items: center; gap: 8px; }
+        .log-mini-toggle span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        
+        .log-row-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .log-row-grid input {
+            background: var(--system-bg); border: none; padding: 10px; border-radius: 8px;
+            text-align: center; font-size: 15px; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
+        }
+        .log-row-grid .label { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 2px; }
+        
+        .detailed-sets { display: none; flex-direction: column; gap: 8px; }
+        .detailed-sets.active { display: flex; }
+        .identical-sets { display: block; }
+        .identical-sets.hidden { display: none; }
+
+        .det-set-row { display: grid; grid-template-columns: 40px 1fr 1fr 30px; gap: 8px; align-items: center; }
+        .det-set-row .set-nr { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center; }
+        .det-set-row input {
+            background: var(--system-bg); border: none; padding: 8px; border-radius: 6px;
+            text-align: center; font-size: 15px; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
+        }
+        
+        .del-btn { color: var(--system-red); background: none; border: none; font-size: 18px; padding: 0; }
+        .btn-text { color: var(--system-blue); background: none; border: none; font-size: 15px; font-weight: 600; padding: 8px 0; text-align: left; }
+        .add-log-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--system-blue); font-size: 17px; font-weight: 600; }
 
     </style>
 </head>
@@ -241,13 +210,8 @@
         <h2 class="account-value" id="totalEarnings">0 €</h2>
     </div>
 
-    <div class="calendar-wrapper">
-        <div class="calendar-strip" id="calendarStrip">
-            </div>
-    </div>
-
-    <div class="appointment-list" id="appointmentList">
-        </div>
+    <div class="calendar-strip" id="calendarStrip"></div>
+    <div class="appointment-list" id="appointmentList"></div>
 
     <div class="modal-overlay" id="addModalOverlay" onclick="closeModalsOnBg(event, 'addModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
@@ -256,13 +220,16 @@
                 <h3>Neuer Termin</h3>
                 <button class="modal-btn right" onclick="saveAppointment()">Sichern</button>
             </div>
-            <div class="form-group">
-                <div class="form-row"><label>Kunde</label><input type="text" id="clientName" placeholder="Name"></div>
+            <div class="form-group" style="z-index: 60;">
+                <div class="form-row" style="position: relative;">
+                    <label>Kunde</label>
+                    <input type="text" id="clientName" placeholder="Name" oninput="handleAutocomplete()" autocomplete="off">
+                    <div class="autocomplete-dropdown" id="acDropdown"></div>
+                </div>
                 <div class="form-row"><label>Datum</label><input type="date" id="appDate"></div>
                 <div class="form-row"><label>Start</label><input type="time" id="appTime" step="300"></div>
                 <div class="form-row"><label>Honorar</label><input type="number" id="appEarnings" placeholder="€" inputmode="numeric"></div>
             </div>
-            <p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:-5px;">Dauer ist automatisch 60 Minuten.</p>
         </div>
     </div>
 
@@ -273,41 +240,43 @@
                 <h3 id="logTitle">Logbuch</h3>
                 <button class="modal-btn right" onclick="saveLogbook()">Sichern</button>
             </div>
-            
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap: 8px; padding: 0 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: center;">
-                <div style="text-align: left;">Übung</div><div>kg</div><div>Wdh</div><div>Satz</div><div></div>
-            </div>
-
-            <div class="logbook-list" id="logbookEntries">
-                </div>
-            <button class="add-log-btn" onclick="addLogbookRow()">+ Übung hinzufügen</button>
+            <div class="logbook-list" id="logbookEntries"></div>
+            <button class="add-log-btn" onclick="addLogCard()">+ Übung hinzufügen</button>
             <input type="hidden" id="currentLogAppId">
         </div>
     </div>
 
     <script>
-        // --- STATUS & DATEN ---
-        let appointments = JSON.parse(localStorage.getItem('pt_pro_data')) || [];
-        let selectedDate = new Date().toISOString().split('T')[0];
+        // --- DATA STATE ---
+        let appointments = JSON.parse(localStorage.getItem('pt_pro_v2_data')) || [];
+        let selectedDate = "";
+        let pendingSmartLogbook = []; // Zwischenspeicher für Autocomplete
 
-        // --- HILFSFUNKTIONEN ---
+        // --- INIT KALENDER (Immer ab aktuellem Montag) ---
+        function initCalendarDate() {
+            const today = new Date();
+            const day = today.getDay(); 
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Berechne Montag
+            const monday = new Date(today.setDate(diff));
+            selectedDate = monday.toISOString().split('T')[0];
+        }
+
+        // --- HELPER ---
         function getEndTime(startTime) {
             if(!startTime) return "";
             let [h, m] = startTime.split(':').map(Number);
             h = (h + 1) % 24;
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         }
-
         function formatCurrency(amount) {
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
         }
-
         function saveData() {
-            localStorage.setItem('pt_pro_data', JSON.stringify(appointments));
+            localStorage.setItem('pt_pro_v2_data', JSON.stringify(appointments));
             updateUI();
         }
 
-        // --- UI UPDATES ---
+        // --- UI RENDER ---
         function updateUI() {
             renderAccount();
             renderCalendar();
@@ -315,9 +284,7 @@
         }
 
         function renderAccount() {
-            const total = appointments.reduce((sum, app) => {
-                return app.completed ? sum + Number(app.earnings || 0) : sum;
-            }, 0);
+            const total = appointments.reduce((sum, app) => app.completed ? sum + Number(app.earnings || 0) : sum, 0);
             document.getElementById('totalEarnings').innerText = formatCurrency(total);
         }
 
@@ -325,31 +292,26 @@
             const strip = document.getElementById('calendarStrip');
             strip.innerHTML = '';
             
-            // Generiere +- 14 Tage um das aktuell gewählte Datum herum
-            const centerDate = new Date(selectedDate);
+            // Startet immer bei dem Montag (selectedDate init) und zeigt 28 Tage
+            const startDate = new Date(selectedDate);
             const todayStr = new Date().toISOString().split('T')[0];
 
-            for (let i = -7; i <= 14; i++) {
-                const d = new Date(centerDate);
+            for (let i = 0; i < 28; i++) {
+                const d = new Date(startDate);
                 d.setDate(d.getDate() + i);
                 const dateStr = d.toISOString().split('T')[0];
                 
-                // Zähle Termine für diesen Tag (für die kleinen Punkte)
                 const appsOnDay = appointments.filter(a => a.date === dateStr).length;
                 let dotsHtml = '';
-                for(let j=0; j<Math.min(appsOnDay, 3); j++) { dotsHtml += '<div class="cal-dot"></div>'; }
+                for(let j=0; j<Math.min(appsOnDay, 3); j++) dotsHtml += '<div class="cal-dot"></div>';
 
                 const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-                const dayName = dateStr === todayStr && i !== 0 ? 'Heute' : weekdays[d.getDay()];
+                const dayName = dateStr === todayStr ? 'Heute' : weekdays[d.getDay()];
 
                 const el = document.createElement('div');
                 el.className = `cal-day ${dateStr === selectedDate ? 'active' : ''}`;
                 el.onclick = () => { selectedDate = dateStr; updateUI(); };
-                el.innerHTML = `
-                    <div class="cal-weekday">${dayName}</div>
-                    <div class="cal-date">${d.getDate()}</div>
-                    <div class="cal-dots">${dotsHtml}</div>
-                `;
+                el.innerHTML = `<div class="cal-weekday">${dayName}</div><div class="cal-date">${d.getDate()}</div><div class="cal-dots">${dotsHtml}</div>`;
                 strip.appendChild(el);
             }
         }
@@ -357,67 +319,93 @@
         function renderAppointments() {
             const listEl = document.getElementById('appointmentList');
             listEl.innerHTML = '';
-            
-            const dayApps = appointments.filter(a => a.date === selectedDate);
-            dayApps.sort((a, b) => new Date(`1970-01-01T${a.time}`) - new Date(`1970-01-01T${b.time}`));
+            const dayApps = appointments.filter(a => a.date === selectedDate).sort((a, b) => new Date(`1970-01-01T${a.time}`) - new Date(`1970-01-01T${b.time}`));
 
-            if (dayApps.length === 0) {
-                listEl.innerHTML = '<div class="empty-state">Freier Tag. Keine Termine.</div>';
-                return;
-            }
+            if (dayApps.length === 0) return listEl.innerHTML = '<div class="empty-state">Keine Termine an diesem Tag.</div>';
 
             dayApps.forEach(app => {
-                const endTime = getEndTime(app.time);
                 const el = document.createElement('div');
                 el.className = 'card';
-                // Klick auf die Karte öffnet Logbuch
                 el.onclick = () => openLogModal(app.id);
-                
                 el.innerHTML = `
                     <div class="card-main">
-                        <div class="card-time">${app.time} – ${endTime} Uhr</div>
+                        <div class="card-time">${app.time} – ${getEndTime(app.time)} Uhr</div>
                         <h3 class="card-name">${app.clientName}</h3>
                         <div class="card-earnings">Honorar: ${formatCurrency(app.earnings || 0)}</div>
                     </div>
                     <div class="toggle-wrapper" onclick="event.stopPropagation()">
                         <div class="toggle-label">Done</div>
-                        <div class="toggle ${app.completed ? 'active' : ''}" onclick="toggleComplete('${app.id}')">
-                            <div class="toggle-knob"></div>
-                        </div>
+                        <div class="toggle ${app.completed ? 'active' : ''}" onclick="toggleComplete('${app.id}')"><div class="toggle-knob"></div></div>
                     </div>
                 `;
                 listEl.appendChild(el);
             });
         }
 
-        // --- AKTIONEN ---
         function toggleComplete(id) {
             const app = appointments.find(a => a.id === id);
-            if(app) {
-                app.completed = !app.completed;
-                saveData();
+            if(app) { app.completed = !app.completed; saveData(); }
+        }
+
+        // --- SMART AUTOCOMPLETE (Datenbank-Funktion) ---
+        function handleAutocomplete() {
+            const input = document.getElementById('clientName').value.toLowerCase();
+            const dropdown = document.getElementById('acDropdown');
+            dropdown.innerHTML = '';
+            
+            if(input.length < 1) return dropdown.classList.remove('active');
+
+            // Finde einzigartige Kunden aus der Historie
+            const uniqueClients = [];
+            const history = [];
+            
+            // Neueste zuerst durchsuchen
+            const sortedApps = [...appointments].sort((a,b) => new Date(b.date) - new Date(a.date));
+            sortedApps.forEach(app => {
+                if(app.clientName.toLowerCase().includes(input) && !uniqueClients.includes(app.clientName)) {
+                    uniqueClients.push(app.clientName);
+                    history.push(app);
+                }
+            });
+
+            if(history.length === 0) return dropdown.classList.remove('active');
+
+            history.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'ac-item';
+                div.innerHTML = `${app.clientName} <span>letztes Mal: ${app.earnings}€</span>`;
+                div.onclick = () => selectAutocomplete(app);
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.add('active');
+        }
+
+        function selectAutocomplete(pastApp) {
+            document.getElementById('clientName').value = pastApp.clientName;
+            document.getElementById('appEarnings').value = pastApp.earnings;
+            document.getElementById('acDropdown').classList.remove('active');
+            
+            // Smart Connect: Speichere das Logbuch des letzten Trainings
+            if(pastApp.logbook && pastApp.logbook.length > 0) {
+                pendingSmartLogbook = JSON.parse(JSON.stringify(pastApp.logbook));
             }
         }
 
         // --- ADD MODAL ---
         function openAddModal() {
+            pendingSmartLogbook = []; // Reset
             document.getElementById('addModalOverlay').classList.add('active');
-            document.getElementById('appDate').value = selectedDate; // Setze Vorauswahl
-            
-            // Standardmäßig auf die nächste volle/halbe Stunde runden (iOS Like)
+            document.getElementById('appDate').value = selectedDate;
             const now = new Date();
-            let h = now.getHours();
-            let m = now.getMinutes() > 30 ? '00' : '30';
+            let h = now.getHours(), m = now.getMinutes() > 30 ? '00' : '30';
             if(m === '00') h = (h + 1) % 24;
             document.getElementById('appTime').value = `${h.toString().padStart(2,'0')}:${m}`;
         }
 
         function closeAddModal() {
             document.getElementById('addModalOverlay').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('clientName').value = '';
-                document.getElementById('appEarnings').value = '';
-            }, 300);
+            document.getElementById('acDropdown').classList.remove('active');
+            setTimeout(() => { document.getElementById('clientName').value = ''; document.getElementById('appEarnings').value = ''; }, 300);
         }
 
         function saveAppointment() {
@@ -426,75 +414,145 @@
             const time = document.getElementById('appTime').value;
             const earnings = document.getElementById('appEarnings').value;
 
-            if (!clientName || !date || !time) return alert('Name, Datum und Startzeit ausfüllen.');
+            if (!clientName || !date || !time) return alert('Bitte Felder ausfüllen.');
 
             appointments.push({
                 id: Date.now().toString(),
                 clientName, date, time, earnings,
                 completed: false,
-                logbook: []
+                logbook: pendingSmartLogbook // Fügt automatisch die Smart-Daten an
             });
 
-            selectedDate = date; // Springe zum Tag des neuen Termins
+            selectedDate = date;
             saveData();
             closeAddModal();
         }
 
-        function closeModalsOnBg(e, id) {
-            if (e.target.id === id) document.getElementById(id).classList.remove('active');
-        }
+        function closeModalsOnBg(e, id) { if (e.target.id === id) document.getElementById(id).classList.remove('active'); }
 
-        // --- LOGBUCH MODAL ---
+        // --- SMART LOGBUCH MODAL ---
         function openLogModal(appId) {
             const app = appointments.find(a => a.id === appId);
             if(!app) return;
-
             document.getElementById('currentLogAppId').value = appId;
-            document.getElementById('logTitle').innerText = `Log: ${app.clientName}`;
+            document.getElementById('logTitle').innerText = app.clientName;
             
             const listEl = document.getElementById('logbookEntries');
             listEl.innerHTML = '';
 
-            // INTELLIGENZ: Wenn aktuelles Logbuch leer, lade letztes Training dieses Kunden
-            let entriesToRender = app.logbook || [];
-            
-            if (entriesToRender.length === 0) {
-                // Suche alle vergangenen Termine desselben Kunden, sortiere nach Datum absteigend
-                const pastApps = appointments
-                    .filter(a => a.clientName === app.clientName && a.date < app.date && a.logbook && a.logbook.length > 0)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                if (pastApps.length > 0) {
-                    // Kopiere das Logbuch vom letzten Mal
-                    entriesToRender = JSON.parse(JSON.stringify(pastApps[0].logbook));
-                }
-            }
-
-            if (entriesToRender.length === 0) {
-                addLogbookRow(); // Mindestens eine leere Zeile
-            } else {
-                entriesToRender.forEach(entry => addLogbookRow(entry));
-            }
+            let entries = app.logbook || [];
+            if (entries.length === 0) addLogCard();
+            else entries.forEach(entry => addLogCard(entry));
 
             document.getElementById('logModalOverlay').classList.add('active');
         }
 
-        function closeLogModal() {
-            document.getElementById('logModalOverlay').classList.remove('active');
+        function closeLogModal() { document.getElementById('logModalOverlay').classList.remove('active'); }
+
+        // Baut eine komplexe Karte pro Übung
+        function addLogCard(data = {ex: '', isDetailed: false, kg: '', rep: '', sets: '3', detailedSets: []}) {
+            const listEl = document.getElementById('logbookEntries');
+            const card = document.createElement('div');
+            card.className = 'log-card';
+            
+            const isDet = data.isDetailed;
+            
+            card.innerHTML = `
+                <div class="log-header">
+                    <input type="text" class="ex-name" placeholder="Übungsname" value="${data.ex}">
+                    <div class="log-mini-toggle">
+                        <span>Einzel-Sätze</span>
+                        <div class="toggle ${isDet ? 'active' : ''}" onclick="toggleLogMode(this)">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <button class="del-btn" onclick="this.closest('.log-card').remove()" style="margin-left:10px;">✕</button>
+                </div>
+                
+                <div class="identical-sets ${isDet ? 'hidden' : ''}">
+                    <div class="log-row-grid">
+                        <div><div class="label">Gewicht (kg)</div><input type="number" class="id-kg" value="${data.kg}" inputmode="decimal"></div>
+                        <div><div class="label">Wiederholungen</div><input type="number" class="id-rep" value="${data.rep}" inputmode="numeric"></div>
+                        <div><div class="label">Anzahl Sätze</div><input type="number" class="id-sets" value="${data.sets}" inputmode="numeric"></div>
+                    </div>
+                </div>
+
+                <div class="detailed-sets ${isDet ? 'active' : ''}">
+                    <div class="det-rows-container"></div>
+                    <button class="btn-text" onclick="addDetailedSetRow(this.previousElementSibling)">+ Weiterer Satz</button>
+                </div>
+            `;
+            
+            const detContainer = card.querySelector('.det-rows-container');
+            if(data.detailedSets && data.detailedSets.length > 0) {
+                data.detailedSets.forEach((set, index) => renderDetRow(detContainer, index+1, set.kg, set.rep));
+            } else {
+                renderDetRow(detContainer, 1, data.kg, data.rep); // Fallback
+            }
+
+            listEl.appendChild(card);
         }
 
-        function addLogbookRow(data = {ex: '', kg: '', rep: '', set: ''}) {
-            const listEl = document.getElementById('logbookEntries');
+        // Logic für den Schalter innerhalb der Übung
+        function toggleLogMode(btn) {
+            btn.classList.toggle('active');
+            const card = btn.closest('.log-card');
+            const isDetailed = btn.classList.contains('active');
+            
+            const idenBlock = card.querySelector('.identical-sets');
+            const detBlock = card.querySelector('.detailed-sets');
+            const detContainer = card.querySelector('.det-rows-container');
+            
+            if(isDetailed) {
+                idenBlock.classList.add('hidden');
+                detBlock.classList.add('active');
+                
+                // UX Magic: Werte aus der Identisch-Ansicht in Einzel-Sätze kopieren
+                const kg = card.querySelector('.id-kg').value;
+                const rep = card.querySelector('.id-rep').value;
+                const sets = parseInt(card.querySelector('.id-sets').value) || 1;
+                
+                detContainer.innerHTML = ''; // Clear
+                for(let i=0; i<sets; i++) renderDetRow(detContainer, i+1, kg, rep);
+            } else {
+                idenBlock.classList.remove('hidden');
+                detBlock.classList.remove('active');
+            }
+        }
+
+        function renderDetRow(container, setNr, kg='', rep='') {
             const row = document.createElement('div');
-            row.className = 'log-row';
+            row.className = 'det-set-row';
             row.innerHTML = `
-                <input type="text" class="ex-name" placeholder="Übung" value="${data.ex}">
-                <input type="number" class="ex-kg" placeholder="0" value="${data.kg}" inputmode="decimal">
-                <input type="number" class="ex-rep" placeholder="0" value="${data.rep}" inputmode="numeric">
-                <input type="number" class="ex-set" placeholder="0" value="${data.set}" inputmode="numeric">
-                <button class="del-btn" onclick="this.parentElement.remove()">✕</button>
+                <div class="set-nr">${setNr}.</div>
+                <input type="number" class="det-kg" placeholder="kg" value="${kg}" inputmode="decimal">
+                <input type="number" class="det-rep" placeholder="wdh" value="${rep}" inputmode="numeric">
+                <button class="del-btn" onclick="removeDetRow(this)">✕</button>
             `;
-            listEl.appendChild(row);
+            container.appendChild(row);
+            updateSetNumbers(container);
+        }
+
+        function addDetailedSetRow(container) {
+            // Kopiere Werte vom letzen Satz (Smart UX)
+            const lastRow = container.lastElementChild;
+            let kg = '', rep = '';
+            if(lastRow) {
+                kg = lastRow.querySelector('.det-kg').value;
+                rep = lastRow.querySelector('.det-rep').value;
+            }
+            renderDetRow(container, 0, kg, rep);
+        }
+
+        function removeDetRow(btn) {
+            const container = btn.closest('.det-rows-container');
+            btn.closest('.det-set-row').remove();
+            updateSetNumbers(container);
+        }
+
+        function updateSetNumbers(container) {
+            const rows = container.querySelectorAll('.det-set-row');
+            rows.forEach((row, i) => row.querySelector('.set-nr').innerText = `${i+1}.`);
         }
 
         function saveLogbook() {
@@ -502,18 +560,33 @@
             const app = appointments.find(a => a.id === appId);
             if(!app) return;
 
-            const rows = document.querySelectorAll('#logbookEntries .log-row');
+            const cards = document.querySelectorAll('.log-card');
             const newLogbook = [];
             
-            rows.forEach(row => {
-                const ex = row.querySelector('.ex-name').value.trim();
-                if (ex) { // Nur speichern wenn Übungsname existiert
+            cards.forEach(card => {
+                const ex = card.querySelector('.ex-name').value.trim();
+                if (!ex) return; // Leere ignorieren
+
+                const isDetailed = card.querySelector('.toggle').classList.contains('active');
+                
+                if(!isDetailed) {
                     newLogbook.push({
-                        ex: ex,
-                        kg: row.querySelector('.ex-kg').value,
-                        rep: row.querySelector('.ex-rep').value,
-                        set: row.querySelector('.ex-set').value
+                        ex, isDetailed: false,
+                        kg: card.querySelector('.id-kg').value,
+                        rep: card.querySelector('.id-rep').value,
+                        sets: card.querySelector('.id-sets').value,
+                        detailedSets: []
                     });
+                } else {
+                    const detRows = card.querySelectorAll('.det-set-row');
+                    const detailedSets = [];
+                    detRows.forEach(row => {
+                        detailedSets.push({
+                            kg: row.querySelector('.det-kg').value,
+                            rep: row.querySelector('.det-rep').value
+                        });
+                    });
+                    newLogbook.push({ ex, isDetailed: true, kg:'', rep:'', sets:'', detailedSets });
                 }
             });
 
@@ -522,15 +595,10 @@
             closeLogModal();
         }
 
-        // Init
+        // --- APP START ---
+        initCalendarDate();
         updateUI();
         
-        // Zentriere Kalender beim Laden
-        setTimeout(() => {
-            const activeDay = document.querySelector('.cal-day.active');
-            if(activeDay) activeDay.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-        }, 300);
-
     </script>
 </body>
 </html>
