@@ -51,23 +51,36 @@
             overflow-x: hidden;
         }
 
-        /* Header & Account */
+        /* Header & Month Picker */
         header {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: flex-start;
             padding: 16px 20px 8px; position: sticky; top: 0; z-index: 10; background: var(--system-bg);
         }
-        h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
-        .add-btn { color: var(--system-blue); font-size: 32px; background: none; border: none; cursor: pointer; padding: 0; }
+        
+        .header-left { display: flex; flex-direction: column; gap: 2px; }
+        h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.1; }
+        
+        .month-selector {
+            position: relative; display: inline-flex; align-items: center; gap: 4px;
+            color: var(--system-blue); font-size: 15px; font-weight: 600; margin-top: 2px;
+        }
+        .month-selector input[type="date"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
 
+        .add-btn { color: var(--system-blue); font-size: 32px; background: none; border: none; cursor: pointer; padding: 0; line-height: 1; }
+
+        /* Account Card */
         .account-card {
-            margin: 8px 20px 20px; padding: 20px;
+            margin: 12px 20px 20px; padding: 20px;
             background: linear-gradient(135deg, var(--system-blue), #5856D6);
             border-radius: 18px; color: white; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
         .account-label { font-size: 15px; opacity: 0.9; margin-bottom: 4px; font-weight: 500; }
         .account-value { font-size: 36px; font-weight: 700; margin: 0; letter-spacing: -1px; }
 
-        /* Calendar */
+        /* Calendar Strip */
         .calendar-strip {
             display: flex; overflow-x: auto; padding: 0 20px 10px; gap: 12px;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
@@ -125,7 +138,7 @@
         .toggle-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .toggle {
             position: relative; width: 51px; height: 31px; border-radius: 31px;
-            background: var(--separator); transition: background 0.3s;
+            background: var(--separator); transition: background 0.3s; flex-shrink: 0;
         }
         .toggle.active { background: var(--system-green); }
         .toggle-knob {
@@ -156,27 +169,33 @@
         .ac-item:last-child { border-bottom: none; }
         .ac-item span { font-size: 13px; color: var(--text-muted); float: right; }
 
-        /* Smart Logbook */
+        /* --- SMART LOGBOOK (FIXED FOR iOS) --- */
         .logbook-list { display: flex; flex-direction: column; gap: 16px; flex: 1; padding-bottom: 40px; }
         
         .log-card {
             background: var(--card-bg); border-radius: 12px; padding: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px;
+            width: 100%; overflow: hidden; /* Fix für Layout-Breakout */
+            box-sizing: border-box;
         }
         
-        .log-header { display: flex; justify-content: space-between; align-items: center; }
+        .log-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; }
         .log-header input { 
             font-size: 17px; font-weight: 600; border: none; background: transparent; 
-            color: var(--text-main); outline: none; flex: 1; -webkit-user-select: auto; user-select: auto;
+            color: var(--text-main); outline: none; flex: 1; min-width: 0; /* THE FIX: Verhindert Rausdrücken */
+            -webkit-user-select: auto; user-select: auto;
         }
         
-        .log-mini-toggle { display: flex; align-items: center; gap: 8px; }
+        .log-mini-toggle { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .log-mini-toggle span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         
-        .log-row-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .log-row-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; }
         .log-row-grid input {
-            background: var(--system-bg); border: none; padding: 10px; border-radius: 8px;
-            text-align: center; font-size: 15px; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
+            background: var(--system-bg); border: none; padding: 10px 4px; border-radius: 8px;
+            text-align: center; font-size: 15px; color: var(--text-main); 
+            -webkit-user-select: auto; user-select: auto;
+            width: 100%; min-width: 0; /* THE FIX: Zwingt Inputs ins Grid */
+            box-sizing: border-box;
         }
         .log-row-grid .label { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 2px; }
         
@@ -185,14 +204,17 @@
         .identical-sets { display: block; }
         .identical-sets.hidden { display: none; }
 
-        .det-set-row { display: grid; grid-template-columns: 40px 1fr 1fr 30px; gap: 8px; align-items: center; }
+        .det-set-row { display: grid; grid-template-columns: 30px 1fr 1fr 24px; gap: 8px; align-items: center; width: 100%; }
         .det-set-row .set-nr { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center; }
         .det-set-row input {
-            background: var(--system-bg); border: none; padding: 8px; border-radius: 6px;
-            text-align: center; font-size: 15px; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
+            background: var(--system-bg); border: none; padding: 8px 4px; border-radius: 6px;
+            text-align: center; font-size: 15px; color: var(--text-main); 
+            -webkit-user-select: auto; user-select: auto;
+            width: 100%; min-width: 0; /* THE FIX */
+            box-sizing: border-box;
         }
         
-        .del-btn { color: var(--system-red); background: none; border: none; font-size: 18px; padding: 0; }
+        .del-btn { color: var(--system-red); background: none; border: none; font-size: 18px; padding: 0; flex-shrink: 0; }
         .btn-text { color: var(--system-blue); background: none; border: none; font-size: 15px; font-weight: 600; padding: 8px 0; text-align: left; }
         .add-log-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--system-blue); font-size: 17px; font-weight: 600; }
 
@@ -201,7 +223,13 @@
 <body>
 
     <header>
-        <h1>Übersicht</h1>
+        <div class="header-left">
+            <h1>Übersicht</h1>
+            <div class="month-selector">
+                <span id="currentMonthLabel">Monat Jahr</span> ▾
+                <input type="date" id="nativeDatePicker" onchange="jumpToDate(event)">
+            </div>
+        </div>
         <button class="add-btn" onclick="openAddModal()">&#43;</button>
     </header>
 
@@ -249,17 +277,8 @@
     <script>
         // --- DATA STATE ---
         let appointments = JSON.parse(localStorage.getItem('pt_pro_v2_data')) || [];
-        let selectedDate = "";
-        let pendingSmartLogbook = []; // Zwischenspeicher für Autocomplete
-
-        // --- INIT KALENDER (Immer ab aktuellem Montag) ---
-        function initCalendarDate() {
-            const today = new Date();
-            const day = today.getDay(); 
-            const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Berechne Montag
-            const monday = new Date(today.setDate(diff));
-            selectedDate = monday.toISOString().split('T')[0];
-        }
+        let selectedDate = new Date().toISOString().split('T')[0]; // Startet immer mit Heute
+        let pendingSmartLogbook = []; 
 
         // --- HELPER ---
         function getEndTime(startTime) {
@@ -273,13 +292,13 @@
         }
         function saveData() {
             localStorage.setItem('pt_pro_v2_data', JSON.stringify(appointments));
-            updateUI();
+            updateUI(false);
         }
 
         // --- UI RENDER ---
-        function updateUI() {
+        function updateUI(scroll = true) {
             renderAccount();
-            renderCalendar();
+            renderCalendar(scroll);
             renderAppointments();
         }
 
@@ -288,15 +307,20 @@
             document.getElementById('totalEarnings').innerText = formatCurrency(total);
         }
 
-        function renderCalendar() {
+        // --- CALENDAR LOGIC ---
+        function renderCalendar(scrollIntoView) {
             const strip = document.getElementById('calendarStrip');
             strip.innerHTML = '';
             
-            // Startet immer bei dem Montag (selectedDate init) und zeigt 28 Tage
-            const startDate = new Date(selectedDate);
-            const todayStr = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 90);
 
-            for (let i = 0; i < 28; i++) {
+            const todayStr = today.toISOString().split('T')[0];
+
+            for (let i = 0; i <= 270; i++) {
                 const d = new Date(startDate);
                 d.setDate(d.getDate() + i);
                 const dateStr = d.toISOString().split('T')[0];
@@ -310,9 +334,34 @@
 
                 const el = document.createElement('div');
                 el.className = `cal-day ${dateStr === selectedDate ? 'active' : ''}`;
-                el.onclick = () => { selectedDate = dateStr; updateUI(); };
+                el.id = `cal-${dateStr}`;
+                el.onclick = () => { 
+                    selectedDate = dateStr; 
+                    updateUI(true); 
+                };
                 el.innerHTML = `<div class="cal-weekday">${dayName}</div><div class="cal-date">${d.getDate()}</div><div class="cal-dots">${dotsHtml}</div>`;
                 strip.appendChild(el);
+            }
+
+            const selD = new Date(selectedDate);
+            const monthName = selD.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            document.getElementById('currentMonthLabel').innerText = monthName;
+            document.getElementById('nativeDatePicker').value = selectedDate;
+
+            if(scrollIntoView) {
+                setTimeout(() => {
+                    const activeDay = document.getElementById(`cal-${selectedDate}`);
+                    if(activeDay) {
+                        activeDay.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
+                }, 50);
+            }
+        }
+
+        function jumpToDate(e) {
+            if(e.target.value) {
+                selectedDate = e.target.value;
+                updateUI(true); 
             }
         }
 
@@ -347,7 +396,6 @@
             if(app) { app.completed = !app.completed; saveData(); }
         }
 
-        // --- SMART AUTOCOMPLETE (Datenbank-Funktion) ---
         function handleAutocomplete() {
             const input = document.getElementById('clientName').value.toLowerCase();
             const dropdown = document.getElementById('acDropdown');
@@ -355,11 +403,8 @@
             
             if(input.length < 1) return dropdown.classList.remove('active');
 
-            // Finde einzigartige Kunden aus der Historie
             const uniqueClients = [];
             const history = [];
-            
-            // Neueste zuerst durchsuchen
             const sortedApps = [...appointments].sort((a,b) => new Date(b.date) - new Date(a.date));
             sortedApps.forEach(app => {
                 if(app.clientName.toLowerCase().includes(input) && !uniqueClients.includes(app.clientName)) {
@@ -384,16 +429,13 @@
             document.getElementById('clientName').value = pastApp.clientName;
             document.getElementById('appEarnings').value = pastApp.earnings;
             document.getElementById('acDropdown').classList.remove('active');
-            
-            // Smart Connect: Speichere das Logbuch des letzten Trainings
             if(pastApp.logbook && pastApp.logbook.length > 0) {
                 pendingSmartLogbook = JSON.parse(JSON.stringify(pastApp.logbook));
             }
         }
 
-        // --- ADD MODAL ---
         function openAddModal() {
-            pendingSmartLogbook = []; // Reset
+            pendingSmartLogbook = []; 
             document.getElementById('addModalOverlay').classList.add('active');
             document.getElementById('appDate').value = selectedDate;
             const now = new Date();
@@ -420,7 +462,7 @@
                 id: Date.now().toString(),
                 clientName, date, time, earnings,
                 completed: false,
-                logbook: pendingSmartLogbook // Fügt automatisch die Smart-Daten an
+                logbook: pendingSmartLogbook 
             });
 
             selectedDate = date;
@@ -430,7 +472,6 @@
 
         function closeModalsOnBg(e, id) { if (e.target.id === id) document.getElementById(id).classList.remove('active'); }
 
-        // --- SMART LOGBUCH MODAL ---
         function openLogModal(appId) {
             const app = appointments.find(a => a.id === appId);
             if(!app) return;
@@ -449,14 +490,13 @@
 
         function closeLogModal() { document.getElementById('logModalOverlay').classList.remove('active'); }
 
-        // Baut eine komplexe Karte pro Übung
         function addLogCard(data = {ex: '', isDetailed: false, kg: '', rep: '', sets: '3', detailedSets: []}) {
             const listEl = document.getElementById('logbookEntries');
             const card = document.createElement('div');
             card.className = 'log-card';
-            
             const isDet = data.isDetailed;
             
+            // Anpassung: Gap auf 8px im HTML für den Header
             card.innerHTML = `
                 <div class="log-header">
                     <input type="text" class="ex-name" placeholder="Übungsname" value="${data.ex}">
@@ -466,9 +506,8 @@
                             <div class="toggle-knob"></div>
                         </div>
                     </div>
-                    <button class="del-btn" onclick="this.closest('.log-card').remove()" style="margin-left:10px;">✕</button>
+                    <button class="del-btn" onclick="this.closest('.log-card').remove()">✕</button>
                 </div>
-                
                 <div class="identical-sets ${isDet ? 'hidden' : ''}">
                     <div class="log-row-grid">
                         <div><div class="label">Gewicht (kg)</div><input type="number" class="id-kg" value="${data.kg}" inputmode="decimal"></div>
@@ -476,7 +515,6 @@
                         <div><div class="label">Anzahl Sätze</div><input type="number" class="id-sets" value="${data.sets}" inputmode="numeric"></div>
                     </div>
                 </div>
-
                 <div class="detailed-sets ${isDet ? 'active' : ''}">
                     <div class="det-rows-container"></div>
                     <button class="btn-text" onclick="addDetailedSetRow(this.previousElementSibling)">+ Weiterer Satz</button>
@@ -487,18 +525,16 @@
             if(data.detailedSets && data.detailedSets.length > 0) {
                 data.detailedSets.forEach((set, index) => renderDetRow(detContainer, index+1, set.kg, set.rep));
             } else {
-                renderDetRow(detContainer, 1, data.kg, data.rep); // Fallback
+                renderDetRow(detContainer, 1, data.kg, data.rep);
             }
 
             listEl.appendChild(card);
         }
 
-        // Logic für den Schalter innerhalb der Übung
         function toggleLogMode(btn) {
             btn.classList.toggle('active');
             const card = btn.closest('.log-card');
             const isDetailed = btn.classList.contains('active');
-            
             const idenBlock = card.querySelector('.identical-sets');
             const detBlock = card.querySelector('.detailed-sets');
             const detContainer = card.querySelector('.det-rows-container');
@@ -506,13 +542,11 @@
             if(isDetailed) {
                 idenBlock.classList.add('hidden');
                 detBlock.classList.add('active');
-                
-                // UX Magic: Werte aus der Identisch-Ansicht in Einzel-Sätze kopieren
                 const kg = card.querySelector('.id-kg').value;
                 const rep = card.querySelector('.id-rep').value;
                 const sets = parseInt(card.querySelector('.id-sets').value) || 1;
                 
-                detContainer.innerHTML = ''; // Clear
+                detContainer.innerHTML = ''; 
                 for(let i=0; i<sets; i++) renderDetRow(detContainer, i+1, kg, rep);
             } else {
                 idenBlock.classList.remove('hidden');
@@ -534,13 +568,9 @@
         }
 
         function addDetailedSetRow(container) {
-            // Kopiere Werte vom letzen Satz (Smart UX)
             const lastRow = container.lastElementChild;
             let kg = '', rep = '';
-            if(lastRow) {
-                kg = lastRow.querySelector('.det-kg').value;
-                rep = lastRow.querySelector('.det-rep').value;
-            }
+            if(lastRow) { kg = lastRow.querySelector('.det-kg').value; rep = lastRow.querySelector('.det-rep').value; }
             renderDetRow(container, 0, kg, rep);
         }
 
@@ -565,7 +595,7 @@
             
             cards.forEach(card => {
                 const ex = card.querySelector('.ex-name').value.trim();
-                if (!ex) return; // Leere ignorieren
+                if (!ex) return; 
 
                 const isDetailed = card.querySelector('.toggle').classList.contains('active');
                 
@@ -595,9 +625,8 @@
             closeLogModal();
         }
 
-        // --- APP START ---
-        initCalendarDate();
-        updateUI();
+        // --- START ---
+        updateUI(true); 
         
     </script>
 </body>
