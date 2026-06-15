@@ -39,7 +39,7 @@
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            touch-action: pan-y; /* Erlaubt vertikales Scrollen, blockiert Pinch-Zoom */
+            touch-action: manipulation; /* FIX: Erlaubt natives Scrollen für Swipe-to-Delete */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -110,18 +110,18 @@
             color: white; font-weight: 600; font-size: 15px;
         }
 
-        .card-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .card-main { flex: 1; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
         .card-time { font-size: 13px; font-weight: 600; color: var(--system-blue); }
         .card-name { font-size: 18px; font-weight: 600; margin: 0; }
         .card-earnings { font-size: 15px; color: var(--text-muted); }
         .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
 
         /* Toggle */
-        .toggle-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-left: 12px; }
+        .toggle-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-left: 12px; cursor: pointer; }
         .toggle-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .toggle { position: relative; width: 51px; height: 31px; border-radius: 31px; background: var(--separator); transition: 0.3s; flex-shrink: 0; }
         .toggle.active { background: var(--system-green); }
-        .toggle-knob { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: 0.3s; }
+        .toggle-knob { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: 0.3s; pointer-events: none; }
         .toggle.active .toggle-knob { transform: translateX(20px); }
 
         /* Bottom Tab Bar */
@@ -148,7 +148,7 @@
         .invoice-item { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 8px; color: var(--text-muted); align-items: center; }
         .invoice-item-del { color: var(--system-red); background: none; border: none; padding: 4px 8px; font-size: 18px; }
         
-        /* Modals & Forms (Unverändert von vorher, optimiert) */
+        /* Modals & Forms */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 100; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .sheet-modal { background-color: var(--system-bg); width: 100%; border-radius: 18px 18px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); }
@@ -193,6 +193,7 @@
 </head>
 <body>
 
+    <!-- TAB 1: KALENDER -->
     <div id="view-calendar" class="view-section active">
         <header>
             <div class="header-left">
@@ -205,16 +206,23 @@
             <button class="add-btn" onclick="openAddModal()">&#43;</button>
         </header>
 
+        <!-- BLAUE KARTE ZURÜCK IM KALENDER -->
+        <div class="account-card">
+            <div class="account-label">Verdientes Honorar</div>
+            <h2 class="account-value" id="calTotalEarnings">0 €</h2>
+        </div>
+
         <div class="calendar-strip" id="calendarStrip"></div>
         <div class="list-container" id="appointmentList"></div>
     </div>
 
+    <!-- TAB 2: ABRECHNUNG -->
     <div id="view-billing" class="view-section">
         <header>
             <div class="header-left"><h1>Abrechnung</h1></div>
         </header>
 
-        <div class="account-card">
+        <div class="account-card" style="background: linear-gradient(135deg, var(--system-green), #28a745);">
             <div class="account-label">Offener Betrag (nicht abgerechnet)</div>
             <h2 class="account-value" id="openEarnings">0 €</h2>
         </div>
@@ -228,6 +236,7 @@
         <div class="list-container" id="invoiceList"></div>
     </div>
 
+    <!-- BOTTOM TAB BAR -->
     <nav class="tab-bar">
         <div class="tab-item active" id="tab-cal" onclick="switchView('calendar')">
             <div class="tab-icon">📅</div><span>Kalender</span>
@@ -238,6 +247,7 @@
     </nav>
 
 
+    <!-- HINZUFÜGEN / EDIT MODAL -->
     <div class="modal-overlay" id="addModalOverlay" onclick="closeModalsOnBg(event, 'addModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -259,6 +269,7 @@
         </div>
     </div>
 
+    <!-- LOGBUCH MODAL -->
     <div class="modal-overlay" id="logModalOverlay">
         <div class="full-modal">
             <div class="modal-header">
@@ -278,7 +289,7 @@
         let invoices = JSON.parse(localStorage.getItem('pt_pro_v3_invoices')) || [];
         let selectedDate = new Date().toISOString().split('T')[0];
         let pendingSmartLogbook = []; 
-        let touchTimer = null; // Für Long Press
+        let touchTimer = null; 
 
         // --- HELPER ---
         function getEndTime(startTime) {
@@ -313,8 +324,23 @@
             }
         }
 
+        // --- ACCOUNT CARDS UPDATE ---
+        function updateAccountCards() {
+            // Kalender Übersicht (Alle abgeschlossenen)
+            const calTotal = appointments.reduce((sum, app) => app.completed ? sum + Number(app.earnings || 0) : sum, 0);
+            const calTotalEl = document.getElementById('calTotalEarnings');
+            if(calTotalEl) calTotalEl.innerText = formatCurrency(calTotal);
+
+            // Abrechnung Übersicht (Offen, aber abgeschlossen)
+            const openApps = appointments.filter(a => a.completed && !a.billed);
+            const openTotal = openApps.reduce((sum, a) => sum + Number(a.earnings || 0), 0);
+            const openEl = document.getElementById('openEarnings');
+            if(openEl) openEl.innerText = formatCurrency(openTotal);
+        }
+
         // --- VIEW 1: KALENDER ---
         function renderCalendarView(scrollIntoView) {
+            updateAccountCards();
             const strip = document.getElementById('calendarStrip');
             strip.innerHTML = '';
             
@@ -359,7 +385,7 @@
             if(e.target.value) { selectedDate = e.target.value; renderCalendarView(true); }
         }
 
-        // --- APPOINTMENT LIST & INTERACTIONS ---
+        // --- APPOINTMENT LIST & SMART GESTURE HANDLING ---
         function renderAppointments() {
             const listEl = document.getElementById('appointmentList');
             listEl.innerHTML = '';
@@ -371,24 +397,24 @@
                 const el = document.createElement('div');
                 el.className = 'swipe-item';
                 
-                // Long Press Logic implementiert auf dem swipe-content
+                // GESTURE FIX: event obj wird direkt übergeben, um z.B. Toggle-Klicks herauszufiltern
                 el.innerHTML = `
                     <div class="swipe-content" 
-                         ontouchstart="handleTouchStart('${app.id}')" 
-                         ontouchmove="handleTouchMove()" 
-                         ontouchend="handleTouchEnd('${app.id}')"
-                         onmousedown="handleTouchStart('${app.id}')"
-                         onmousemove="handleTouchMove()"
-                         onmouseup="handleTouchEnd('${app.id}')"
-                         onmouseleave="handleTouchMove()">
+                         ontouchstart="handleTouchStart(event, '${app.id}')" 
+                         ontouchmove="handleTouchMove(event)" 
+                         ontouchend="handleTouchEnd(event, '${app.id}')"
+                         onmousedown="handleTouchStart(event, '${app.id}')"
+                         onmousemove="handleTouchMove(event)"
+                         onmouseup="handleTouchEnd(event, '${app.id}')"
+                         onmouseleave="handleTouchMove(event)">
                         <div class="card-main">
                             <div class="card-time">${app.time} – ${getEndTime(app.time)} Uhr</div>
                             <h3 class="card-name">${app.clientName} ${app.billed ? '✅ (Abgerechnet)' : ''}</h3>
                             <div class="card-earnings">Honorar: ${formatCurrency(app.earnings || 0)}</div>
                         </div>
-                        <div class="toggle-wrapper" onclick="event.stopPropagation()">
+                        <div class="toggle-wrapper" onclick="toggleComplete(event, '${app.id}')">
                             <div class="toggle-label">Done</div>
-                            <div class="toggle ${app.completed ? 'active' : ''}" onclick="toggleComplete('${app.id}')"><div class="toggle-knob"></div></div>
+                            <div class="toggle ${app.completed ? 'active' : ''}"><div class="toggle-knob"></div></div>
                         </div>
                     </div>
                     <div class="swipe-action" onclick="deleteAppointment('${app.id}')">Löschen</div>
@@ -397,25 +423,49 @@
             });
         }
 
-        // LONG PRESS LOGIC
+        // SMART TOUCH LOGIC FIX
         let isLongPress = false;
-        function handleTouchStart(id) {
+        let startX = 0, startY = 0, isScrolling = false;
+
+        function handleTouchStart(e, id) {
+            if(e.target.closest('.toggle-wrapper')) return; // Wenn der Toggle berührt wird, ignoriere es für Long Press
+            
+            startX = e.touches ? e.touches[0].clientX : e.clientX;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+            isScrolling = false;
             isLongPress = false;
+
             touchTimer = setTimeout(() => {
                 isLongPress = true;
                 openEditModal(id);
-            }, 500); // 500ms gedrückt halten
+            }, 500); 
         }
-        function handleTouchMove() { clearTimeout(touchTimer); }
-        function handleTouchEnd(id) {
+
+        function handleTouchMove(e) {
+            if(!startX) return;
+            let curX = e.touches ? e.touches[0].clientX : e.clientX;
+            let curY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Wenn der Nutzer wischt/scrollt, brich den Long-Press Timer ab
+            if(Math.abs(curX - startX) > 10 || Math.abs(curY - startY) > 10) {
+                isScrolling = true;
+                clearTimeout(touchTimer);
+            }
+        }
+
+        function handleTouchEnd(e, id) {
             clearTimeout(touchTimer);
-            // Wenn es kein Long Press war, behandle es als normalen Klick (Logbuch öffnen)
-            if(!isLongPress) {
+            if(e.target.closest('.toggle-wrapper')) return; // Wenn Toggle gedrückt, mache nichts (wird vom onclick erledigt)
+
+            // Wenn es kein langer Druck und kein Scrollen/Wischen war -> Logbuch öffnen
+            if(!isLongPress && !isScrolling) {
                 openLogModal(id);
             }
         }
 
-        function toggleComplete(id) {
+        // TOGGLE FIX
+        function toggleComplete(e, id) {
+            if(e) e.stopPropagation(); // Stoppt Event-Bubbling sauber
             const app = appointments.find(a => a.id === id);
             if(app) { 
                 if(app.billed) return alert("Bereits abgerechnet. Status kann nicht geändert werden.");
@@ -463,7 +513,6 @@
             document.getElementById('clientName').value = pastApp.clientName;
             document.getElementById('appEarnings').value = pastApp.earnings;
             document.getElementById('acDropdown').classList.remove('active');
-            // WICHTIG: Tiefe Kopie, damit Referenzen nicht verknüpft bleiben (BUGFIX)
             if(pastApp.logbook && pastApp.logbook.length > 0) {
                 pendingSmartLogbook = JSON.parse(JSON.stringify(pastApp.logbook));
             }
@@ -518,14 +567,13 @@
                     appointments[appIndex].date = date;
                     appointments[appIndex].time = time;
                     appointments[appIndex].earnings = earnings;
-                    // Logbook bleibt unangetastet außer es kam via SmartSuggest
                 }
             } else {
                 appointments.push({
                     id: Date.now().toString(),
                     clientName, date, time, earnings,
                     completed: false, billed: false,
-                    logbook: JSON.parse(JSON.stringify(pendingSmartLogbook)) // Tiefe Kopie BUGFIX
+                    logbook: JSON.parse(JSON.stringify(pendingSmartLogbook)) 
                 });
             }
 
@@ -535,32 +583,25 @@
         }
         function closeModalsOnBg(e, id) { if (e.target.id === id) document.getElementById(id).classList.remove('active'); }
 
-        // --- VIEW 2: ABRECHNUNG (NEU) ---
+        // --- VIEW 2: ABRECHNUNG ---
         function renderBillingView() {
+            updateAccountCards();
             const openListEl = document.getElementById('openBillingList');
             const historyListEl = document.getElementById('invoiceList');
-            const actionArea = document.getElementById('actionArea');
+            const actionArea = document.getElementById('billingActionArea');
             
-            // Finde alle offenen, abgeschlossenen Termine
             const openApps = appointments.filter(a => a.completed && !a.billed);
-            const openTotal = openApps.reduce((sum, a) => sum + Number(a.earnings || 0), 0);
             
-            document.getElementById('openEarnings').innerText = formatCurrency(openTotal);
-
-            // Button Logik
-            const btnContainer = document.getElementById('billingActionArea');
             if(openApps.length > 0) {
-                btnContainer.innerHTML = `<button class="bill-btn" onclick="generateInvoice()">Aktuelle Stunden (${openApps.length}) abrechnen</button>`;
+                actionArea.innerHTML = `<button class="bill-btn" onclick="generateInvoice()">Aktuelle Stunden (${openApps.length}) abrechnen</button>`;
             } else {
-                btnContainer.innerHTML = '';
+                actionArea.innerHTML = '';
             }
 
-            // Liste Offene Posten
             openListEl.innerHTML = '';
             if(openApps.length === 0) {
                 openListEl.innerHTML = '<div class="empty-state">Keine offenen Posten. Alle getätigten Stunden sind abgerechnet.</div>';
             } else {
-                // Gruppiere nach Kunde für bessere Übersicht
                 openApps.forEach(app => {
                     const el = document.createElement('div');
                     el.className = 'card';
@@ -575,7 +616,6 @@
                 });
             }
 
-            // Liste Rechnungen
             historyListEl.innerHTML = '';
             const sortedInvoices = [...invoices].sort((a,b) => b.id - a.id);
             
@@ -638,7 +678,6 @@
                 }))
             };
 
-            // Markiere Termine als abgerechnet
             openApps.forEach(a => {
                 const appIndex = appointments.findIndex(glob => glob.id === a.id);
                 if(appIndex > -1) appointments[appIndex].billed = true;
@@ -653,7 +692,6 @@
             
             const inv = invoices.find(i => i.id === invId);
             if(inv) {
-                // Setze alle Items wieder auf open
                 inv.items.forEach(item => {
                     const appIndex = appointments.findIndex(a => a.id === item.appId);
                     if(appIndex > -1) appointments[appIndex].billed = false;
@@ -672,15 +710,12 @@
                 const itemToRemove = inv.items.find(i => i.appId === appId);
                 
                 if(itemToRemove) {
-                    // App wieder freigeben
                     const appIndex = appointments.findIndex(a => a.id === appId);
                     if(appIndex > -1) appointments[appIndex].billed = false;
 
-                    // Item aus Rechnung löschen
                     inv.items = inv.items.filter(i => i.appId !== appId);
                     inv.total = inv.items.reduce((sum, a) => sum + Number(a.earnings || 0), 0);
 
-                    // Wenn Rechnung leer, lösche ganze Rechnung
                     if(inv.items.length === 0) {
                         invoices = invoices.filter(i => i.id !== invId);
                     }
@@ -690,7 +725,7 @@
         }
 
 
-        // --- LOGBUCH (Unverändert, nur Helper geladen) ---
+        // --- LOGBUCH ---
         function openLogModal(appId) {
             const app = appointments.find(a => a.id === appId);
             if(!app) return;
