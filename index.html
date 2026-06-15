@@ -85,6 +85,7 @@
         .account-card.clickable:active { transform: scale(0.97); opacity: 0.9; }
         .account-label { font-size: 15px; opacity: 0.9; margin-bottom: 4px; font-weight: 500; display:flex; justify-content:space-between;}
         .account-value { font-size: 36px; font-weight: 700; margin: 0; letter-spacing: -1px; }
+        .account-subtitle { font-size: 14px; opacity: 0.8; margin-top: 4px; font-weight: 500; }
 
         /* Calendar Strip */
         .calendar-strip {
@@ -226,13 +227,13 @@
             <button class="add-btn" onclick="openAddModal()">&#43;</button>
         </header>
 
-        <!-- BLAUE KARTE (JETZT KLICKBAR & GEFILTERT) -->
         <div class="account-card clickable" onclick="openBreakdownModal()">
             <div class="account-label">
                 <span>Offenes Honorar</span>
                 <span style="opacity: 0.7; font-size: 13px;">(Tippen für Details ❯)</span>
             </div>
             <h2 class="account-value" id="calTotalEarnings">0 €</h2>
+            <div class="account-subtitle" id="calTotalHours">0 Stunden</div>
         </div>
 
         <div class="calendar-strip" id="calendarStrip"></div>
@@ -251,6 +252,7 @@
                 <span style="opacity: 0.7; font-size: 13px;">(Tippen für Details ❯)</span>
             </div>
             <h2 class="account-value" id="openEarnings">0 €</h2>
+            <div class="account-subtitle" id="openTotalHours">0 Stunden</div>
         </div>
 
         <div id="billingActionArea"></div>
@@ -299,7 +301,7 @@
     <div class="modal-overlay" id="breakdownModalOverlay" onclick="closeModalsOnBg(event, 'breakdownModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <div style="width: 80px;"></div> <!-- Spacer für Zentrierung -->
+                <div style="width: 80px;"></div>
                 <h3>Offene Posten</h3>
                 <button class="modal-btn right" onclick="closeBreakdownModal()">Fertig</button>
             </div>
@@ -336,6 +338,7 @@
         // --- DATA STATE ---
         let appointments = JSON.parse(localStorage.getItem('pt_pro_v3_data')) || [];
         let invoices = JSON.parse(localStorage.getItem('pt_pro_v3_invoices')) || [];
+        let deletedAppIds = JSON.parse(localStorage.getItem('pt_pro_v3_deleted')) || []; // NEU: Für Kalender-Löschungen
         let selectedDate = getLocalDateStr(); 
         let pendingSmartLogbook = []; 
         let touchTimer = null; 
@@ -352,6 +355,7 @@
         function saveData() {
             localStorage.setItem('pt_pro_v3_data', JSON.stringify(appointments));
             localStorage.setItem('pt_pro_v3_invoices', JSON.stringify(invoices));
+            localStorage.setItem('pt_pro_v3_deleted', JSON.stringify(deletedAppIds));
             renderCalendarView(false);
             renderBillingView();
         }
@@ -371,18 +375,23 @@
         }
 
         function updateAccountCards() {
-            // Beide Karten zeigen nun identisch die noch nicht abgerechneten (aber absolvierten) Honorare an
             const openApps = appointments.filter(a => a.completed && !a.billed);
             const openTotal = openApps.reduce((sum, a) => sum + Number(a.earnings || 0), 0);
+            const openHours = openApps.length;
+            const hourText = `${openHours} Stunde${openHours !== 1 ? 'n' : ''}`;
             
             const calTotalEl = document.getElementById('calTotalEarnings');
             if(calTotalEl) calTotalEl.innerText = formatCurrency(openTotal);
+            const calHoursEl = document.getElementById('calTotalHours');
+            if(calHoursEl) calHoursEl.innerText = hourText;
 
             const openEl = document.getElementById('openEarnings');
             if(openEl) openEl.innerText = formatCurrency(openTotal);
+            const openHoursEl = document.getElementById('openTotalHours');
+            if(openHoursEl) openHoursEl.innerText = hourText;
         }
 
-        // --- BREAKDOWN MODAL (NEU) ---
+        // --- BREAKDOWN MODAL ---
         function openBreakdownModal() {
             const listEl = document.getElementById('breakdownList');
             listEl.innerHTML = '';
@@ -536,17 +545,21 @@
         function deleteAppointment(id) {
             const app = appointments.find(a => a.id === id);
             if(app && app.billed) return alert("Dieser Termin ist auf einer Rechnung. Storniere erst die Rechnung.");
+            
+            if(!deletedAppIds.includes(id)) {
+                deletedAppIds.push(id); // Speichern für den nächsten ICS Sync (Storno an Apple)
+            }
+            
             appointments = appointments.filter(a => a.id !== id);
             saveData();
         }
 
         // --- EXPORT FUNKTIONEN ---
         function exportICS() {
-            if (appointments.length === 0) return alert("Keine Termine zum Exportieren vorhanden.");
-            
             let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PT Tracker//DE\nCALSCALE:GREGORIAN\n";
             const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + "Z";
             
+            // 1. Alle aktiven Termine exportieren (erstellt oder überschreibt alte)
             appointments.forEach(app => {
                 const [y, m, d] = app.date.split('-');
                 const [h, min] = app.time.split(':');
@@ -562,6 +575,16 @@
                 icsMSG += `DTEND;TZID=Europe/Berlin:${endStr}\n`;
                 icsMSG += "END:VEVENT\n";
             });
+
+            // 2. Alle gelöschten Termine exportieren (Zwingt Apple Kalender zum Löschen)
+            deletedAppIds.forEach(id => {
+                icsMSG += "BEGIN:VEVENT\n";
+                icsMSG += `UID:${id}@pttracker\n`;
+                icsMSG += `DTSTAMP:${now}\n`;
+                icsMSG += `STATUS:CANCELLED\n`; // Dieser Code löscht es beim Import!
+                icsMSG += "END:VEVENT\n";
+            });
+
             icsMSG += "END:VCALENDAR";
 
             const blob = new Blob([icsMSG], { type: 'text/calendar;charset=utf-8' });
