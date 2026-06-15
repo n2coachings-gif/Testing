@@ -10,6 +10,7 @@
     <style>
         :root {
             --system-blue: #007AFF;
+            --system-green: #34C759;
             --system-red: #FF3B30;
             --system-bg: #F2F2F7;
             --card-bg: #FFFFFF;
@@ -21,6 +22,7 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --system-blue: #0A84FF;
+                --system-green: #30D158;
                 --system-red: #FF453A;
                 --system-bg: #000000;
                 --card-bg: #1C1C1E;
@@ -46,374 +48,489 @@
             color: var(--text-main);
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
             overflow-x: hidden;
         }
 
-        /* Navigation Bar */
+        /* Header */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 16px 20px 8px;
             background-color: var(--system-bg);
             position: sticky;
             top: 0;
             z-index: 10;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background-color: rgba(242, 242, 247, 0.8);
-            border-bottom: 0.5px solid var(--separator);
         }
 
-        @media (prefers-color-scheme: dark) {
-            header {
-                background-color: rgba(0, 0, 0, 0.8);
-            }
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 34px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
+        h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+        
         .add-btn {
             color: var(--system-blue);
-            font-size: 28px;
+            font-size: 32px;
             background: none;
             border: none;
             cursor: pointer;
-            font-weight: 300;
             padding: 0;
+            line-height: 1;
         }
 
-        /* Liste */
-        .appointment-list {
+        /* Account Stats */
+        .account-card {
+            margin: 8px 20px 20px;
             padding: 20px;
+            background: linear-gradient(135deg, var(--system-blue), #5856D6);
+            border-radius: 18px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .account-label { font-size: 15px; opacity: 0.9; margin-bottom: 4px; font-weight: 500;}
+        .account-value { font-size: 36px; font-weight: 700; margin: 0; letter-spacing: -1px; }
+
+        /* Calendar Strip */
+        .calendar-wrapper {
+            margin-bottom: 10px;
+        }
+        
+        .calendar-strip {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 10px;
+            gap: 12px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .calendar-strip::-webkit-scrollbar { display: none; }
+
+        .cal-day {
+            min-width: 60px;
+            padding: 12px 0;
+            border-radius: 16px;
+            background-color: var(--card-bg);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: center;
+            transition: all 0.2s;
         }
+
+        .cal-day.active { background-color: var(--text-main); color: var(--system-bg); }
+        .cal-day.active .cal-weekday { color: var(--system-bg); opacity: 0.8; }
+        .cal-weekday { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+        .cal-date { font-size: 20px; font-weight: 500; }
+        .cal-dots { display: flex; gap: 3px; margin-top: 4px; height: 4px; }
+        .cal-dot { width: 4px; height: 4px; border-radius: 50%; background-color: var(--system-blue); }
+
+        /* List */
+        .appointment-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
 
         .card {
             background-color: var(--card-bg);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .card:active {
-            transform: scale(0.97);
-            opacity: 0.8;
-        }
+        .card-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .card-time { font-size: 13px; font-weight: 600; color: var(--system-blue); }
+        .card-name { font-size: 18px; font-weight: 600; margin: 0; }
+        .card-earnings { font-size: 15px; color: var(--text-muted); }
 
-        .card-info h2 {
-            margin: 0 0 4px 0;
-            font-size: 17px;
-            font-weight: 600;
+        /* iOS Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+            border-left: 1px solid var(--separator);
+            padding-left: 16px;
         }
-
-        .card-info p {
-            margin: 0;
-            font-size: 15px;
-            color: var(--text-muted);
+        .toggle-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .toggle {
+            position: relative; width: 51px; height: 31px; border-radius: 31px;
+            background: var(--separator); transition: background 0.3s;
         }
-
-        .delete-btn {
-            color: var(--system-red);
-            background: none;
-            border: none;
-            font-size: 15px;
-            cursor: pointer;
-            padding: 8px 0 8px 16px;
+        .toggle.active { background: var(--system-green); }
+        .toggle-knob {
+            position: absolute; top: 2px; left: 2px; width: 27px; height: 27px;
+            background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .toggle.active .toggle-knob { transform: translateX(20px); }
 
-        /* Modal Overlay */
+        /* Modals (BottomSheet & FullScreen) */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100;
         }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+        .sheet-modal {
+            background-color: var(--system-bg); width: 100%; border-radius: 18px 18px 0 0;
+            padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            max-height: 90vh; overflow-y: auto;
         }
+        .modal-overlay.active .sheet-modal { transform: translateY(0); }
 
-        .modal {
-            background-color: var(--system-bg);
-            width: 100%;
-            border-radius: 18px 18px 0 0;
-            padding: 20px;
-            padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        .full-modal {
+            background-color: var(--system-bg); width: 100%; height: 100%;
+            padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            transform: translateY(100%); transition: transform 0.3s ease;
+            overflow-y: auto; display: flex; flex-direction: column;
         }
+        .modal-overlay.active .full-modal { transform: translateY(0); }
 
-        .modal-overlay.active .modal {
-            transform: translateY(0);
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 17px; font-weight: 600; text-align: center; flex: 1; }
+        .modal-btn { background: none; border: none; font-size: 17px; color: var(--system-blue); cursor: pointer; padding: 0; min-width: 80px;}
+        .modal-btn.left { text-align: left; }
+        .modal-btn.right { text-align: right; font-weight: 600; }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        /* Form Inputs */
+        .form-group { background-color: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+        .form-row { display: flex; padding: 12px 16px; border-bottom: 0.5px solid var(--separator); align-items: center; }
+        .form-row:last-child { border-bottom: none; }
+        .form-row label { width: 100px; font-size: 17px; }
+        .form-row input { 
+            flex: 1; border: none; font-size: 17px; outline: none; background: transparent; 
+            text-align: right; color: var(--text-main); -webkit-user-select: auto; user-select: auto;
         }
+        input[type="date"], input[type="time"] { appearance: none; -webkit-appearance: none; }
 
-        .modal-header h3 {
-            margin: 0;
-            font-size: 17px;
-            font-weight: 600;
+        /* Logbook Specifics */
+        .logbook-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+        .log-row { 
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap: 8px; 
+            background: var(--card-bg); padding: 12px; border-radius: 12px; align-items: center;
         }
-
-        .modal-close, .modal-save {
-            background: none;
-            border: none;
-            font-size: 17px;
-            color: var(--system-blue);
-            cursor: pointer;
-            padding: 0;
+        .log-row input { 
+            width: 100%; border: none; background: var(--system-bg); padding: 8px; 
+            border-radius: 6px; font-size: 15px; text-align: center; color: var(--text-main);
+            -webkit-user-select: auto; user-select: auto;
         }
-
-        .modal-save {
-            font-weight: 600;
-        }
-
-        /* Formular */
-        .form-group {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .form-row {
-            display: flex;
-            padding: 12px 16px;
-            border-bottom: 0.5px solid var(--separator);
-            align-items: center;
-        }
-
-        .form-row:last-child {
-            border-bottom: none;
-        }
-
-        .form-row label {
-            width: 90px;
-            font-size: 17px;
-            color: var(--text-main);
-        }
-
-        .form-row input {
-            flex: 1;
-            border: none;
-            font-size: 17px;
-            outline: none;
-            background: transparent;
-            -webkit-user-select: auto;
-            user-select: auto;
-            color: var(--text-main);
-            text-align: right;
-        }
+        .log-row input.ex-name { text-align: left; }
+        .log-row .del-btn { color: var(--system-red); background: none; border: none; font-size: 18px; padding: 0; }
         
-        .form-row input::placeholder {
-            color: var(--text-muted);
+        .add-log-btn { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
+            background: var(--card-bg); color: var(--system-blue); font-size: 17px; font-weight: 600; margin-top: 10px;
         }
 
-        input[type="date"], input[type="time"] {
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 60px 20px;
-            font-size: 15px;
-            line-height: 1.4;
-        }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 15px; }
 
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Termine</h1>
-        <button class="add-btn" onclick="openModal()">&#43;</button>
+        <h1>Übersicht</h1>
+        <button class="add-btn" onclick="openAddModal()">&#43;</button>
     </header>
+
+    <div class="account-card">
+        <div class="account-label">Verdientes Honorar</div>
+        <h2 class="account-value" id="totalEarnings">0 €</h2>
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="calendar-strip" id="calendarStrip">
+            </div>
+    </div>
 
     <div class="appointment-list" id="appointmentList">
         </div>
 
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
-        <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-overlay" id="addModalOverlay" onclick="closeModalsOnBg(event, 'addModalOverlay')">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <button class="modal-close" onclick="closeModal()">Abbrechen</button>
+                <button class="modal-btn left" onclick="closeAddModal()">Abbrechen</button>
                 <h3>Neuer Termin</h3>
-                <button class="modal-save" onclick="saveAppointment()">Sichern</button>
+                <button class="modal-btn right" onclick="saveAppointment()">Sichern</button>
+            </div>
+            <div class="form-group">
+                <div class="form-row"><label>Kunde</label><input type="text" id="clientName" placeholder="Name"></div>
+                <div class="form-row"><label>Datum</label><input type="date" id="appDate"></div>
+                <div class="form-row"><label>Start</label><input type="time" id="appTime" step="300"></div>
+                <div class="form-row"><label>Honorar</label><input type="number" id="appEarnings" placeholder="€" inputmode="numeric"></div>
+            </div>
+            <p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:-5px;">Dauer ist automatisch 60 Minuten.</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="logModalOverlay">
+        <div class="full-modal">
+            <div class="modal-header">
+                <button class="modal-btn left" onclick="closeLogModal()">Zurück</button>
+                <h3 id="logTitle">Logbuch</h3>
+                <button class="modal-btn right" onclick="saveLogbook()">Sichern</button>
             </div>
             
-            <div class="form-group">
-                <div class="form-row">
-                    <label>Kunde</label>
-                    <input type="text" id="clientName" placeholder="Name">
-                </div>
-                <div class="form-row">
-                    <label>Datum</label>
-                    <input type="date" id="appDate">
-                </div>
-                <div class="form-row">
-                    <label>Uhrzeit</label>
-                    <input type="time" id="appTime">
-                </div>
-                <div class="form-row">
-                    <label>Dauer</label>
-                    <input type="text" id="appDuration" placeholder="z.B. 60 Min">
-                </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap: 8px; padding: 0 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: center;">
+                <div style="text-align: left;">Übung</div><div>kg</div><div>Wdh</div><div>Satz</div><div></div>
             </div>
+
+            <div class="logbook-list" id="logbookEntries">
+                </div>
+            <button class="add-log-btn" onclick="addLogbookRow()">+ Übung hinzufügen</button>
+            <input type="hidden" id="currentLogAppId">
         </div>
     </div>
 
     <script>
-        // Lokaler Speicher initialisieren
-        let appointments = JSON.parse(localStorage.getItem('pt_tracker_data')) || [];
+        // --- STATUS & DATEN ---
+        let appointments = JSON.parse(localStorage.getItem('pt_pro_data')) || [];
+        let selectedDate = new Date().toISOString().split('T')[0];
 
-        // DOM Elemente
-        const listEl = document.getElementById('appointmentList');
-        const modalOverlay = document.getElementById('modalOverlay');
-        
-        const clientNameInput = document.getElementById('clientName');
-        const appDateInput = document.getElementById('appDate');
-        const appTimeInput = document.getElementById('appTime');
-        const appDurationInput = document.getElementById('appDuration');
-
-        // Render Funktion
-        function renderAppointments() {
-            listEl.innerHTML = '';
-            
-            if (appointments.length === 0) {
-                listEl.innerHTML = '<div class="empty-state">Keine anstehenden Termine.<br>Tippe oben rechts auf das + um zu starten.</div>';
-                return;
-            }
-
-            // Nach Datum & Uhrzeit sortieren
-            appointments.sort((a, b) => {
-                const dateA = new Date(`${a.date}T${a.time}`);
-                const dateB = new Date(`${b.date}T${b.time}`);
-                return dateA - dateB;
-            });
-
-            appointments.forEach(app => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                // Datum formatieren
-                const dateObj = new Date(`${app.date}T${app.time}`);
-                const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-                const timeStr = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-
-                card.innerHTML = `
-                    <div class="card-info">
-                        <h2>${app.clientName}</h2>
-                        <p>${dateStr}, ${timeStr} Uhr • ${app.duration}</p>
-                    </div>
-                    <button class="delete-btn" onclick="deleteAppointment('${app.id}')">Löschen</button>
-                `;
-                listEl.appendChild(card);
-            });
+        // --- HILFSFUNKTIONEN ---
+        function getEndTime(startTime) {
+            if(!startTime) return "";
+            let [h, m] = startTime.split(':').map(Number);
+            h = (h + 1) % 24;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         }
 
-        // Modal Steuerung
-        function openModal() {
-            modalOverlay.classList.add('active');
-            
-            // Standardmäßig heutiges Datum setzen, wenn leer
-            if (!appDateInput.value) {
-                const today = new Date();
-                appDateInput.value = today.toISOString().split('T')[0];
-            }
-            
-            // Setze Fokus kurz verzögert (bessere iOS UX)
-            setTimeout(() => {
-                clientNameInput.focus();
-            }, 300);
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
         }
 
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-            // Formular zurücksetzen, sobald die Animation beendet ist
-            setTimeout(clearForm, 300);
+        function saveData() {
+            localStorage.setItem('pt_pro_data', JSON.stringify(appointments));
+            updateUI();
         }
 
-        function closeModalOnBg(e) {
-            if (e.target === modalOverlay) {
-                closeModal();
-            }
-        }
-
-        function clearForm() {
-            clientNameInput.value = '';
-            appDateInput.value = '';
-            appTimeInput.value = '';
-            appDurationInput.value = '';
-        }
-
-        // Datenspeicherung
-        function saveAppointment() {
-            const clientName = clientNameInput.value.trim();
-            const date = appDateInput.value;
-            const time = appTimeInput.value;
-            const duration = appDurationInput.value.trim() || '60 Min';
-
-            if (!clientName || !date || !time) {
-                alert('Bitte Name, Datum und Uhrzeit ausfüllen.');
-                return;
-            }
-
-            const newAppointment = {
-                id: Date.now().toString(), // Simpler Unique ID Generator
-                clientName,
-                date,
-                time,
-                duration
-            };
-
-            appointments.push(newAppointment);
-            localStorage.setItem('pt_tracker_data', JSON.stringify(appointments));
-            
-            closeModal();
+        // --- UI UPDATES ---
+        function updateUI() {
+            renderAccount();
+            renderCalendar();
             renderAppointments();
         }
 
-        function deleteAppointment(id) {
-            // Nativen iOS-Dialog simulieren
-            if (confirm('Möchtest du diesen Termin wirklich löschen?')) {
-                appointments = appointments.filter(app => app.id !== id);
-                localStorage.setItem('pt_tracker_data', JSON.stringify(appointments));
-                renderAppointments();
+        function renderAccount() {
+            const total = appointments.reduce((sum, app) => {
+                return app.completed ? sum + Number(app.earnings || 0) : sum;
+            }, 0);
+            document.getElementById('totalEarnings').innerText = formatCurrency(total);
+        }
+
+        function renderCalendar() {
+            const strip = document.getElementById('calendarStrip');
+            strip.innerHTML = '';
+            
+            // Generiere +- 14 Tage um das aktuell gewählte Datum herum
+            const centerDate = new Date(selectedDate);
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for (let i = -7; i <= 14; i++) {
+                const d = new Date(centerDate);
+                d.setDate(d.getDate() + i);
+                const dateStr = d.toISOString().split('T')[0];
+                
+                // Zähle Termine für diesen Tag (für die kleinen Punkte)
+                const appsOnDay = appointments.filter(a => a.date === dateStr).length;
+                let dotsHtml = '';
+                for(let j=0; j<Math.min(appsOnDay, 3); j++) { dotsHtml += '<div class="cal-dot"></div>'; }
+
+                const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+                const dayName = dateStr === todayStr && i !== 0 ? 'Heute' : weekdays[d.getDay()];
+
+                const el = document.createElement('div');
+                el.className = `cal-day ${dateStr === selectedDate ? 'active' : ''}`;
+                el.onclick = () => { selectedDate = dateStr; updateUI(); };
+                el.innerHTML = `
+                    <div class="cal-weekday">${dayName}</div>
+                    <div class="cal-date">${d.getDate()}</div>
+                    <div class="cal-dots">${dotsHtml}</div>
+                `;
+                strip.appendChild(el);
             }
         }
 
-        // Init beim Laden
-        renderAppointments();
+        function renderAppointments() {
+            const listEl = document.getElementById('appointmentList');
+            listEl.innerHTML = '';
+            
+            const dayApps = appointments.filter(a => a.date === selectedDate);
+            dayApps.sort((a, b) => new Date(`1970-01-01T${a.time}`) - new Date(`1970-01-01T${b.time}`));
+
+            if (dayApps.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">Freier Tag. Keine Termine.</div>';
+                return;
+            }
+
+            dayApps.forEach(app => {
+                const endTime = getEndTime(app.time);
+                const el = document.createElement('div');
+                el.className = 'card';
+                // Klick auf die Karte öffnet Logbuch
+                el.onclick = () => openLogModal(app.id);
+                
+                el.innerHTML = `
+                    <div class="card-main">
+                        <div class="card-time">${app.time} – ${endTime} Uhr</div>
+                        <h3 class="card-name">${app.clientName}</h3>
+                        <div class="card-earnings">Honorar: ${formatCurrency(app.earnings || 0)}</div>
+                    </div>
+                    <div class="toggle-wrapper" onclick="event.stopPropagation()">
+                        <div class="toggle-label">Done</div>
+                        <div class="toggle ${app.completed ? 'active' : ''}" onclick="toggleComplete('${app.id}')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(el);
+            });
+        }
+
+        // --- AKTIONEN ---
+        function toggleComplete(id) {
+            const app = appointments.find(a => a.id === id);
+            if(app) {
+                app.completed = !app.completed;
+                saveData();
+            }
+        }
+
+        // --- ADD MODAL ---
+        function openAddModal() {
+            document.getElementById('addModalOverlay').classList.add('active');
+            document.getElementById('appDate').value = selectedDate; // Setze Vorauswahl
+            
+            // Standardmäßig auf die nächste volle/halbe Stunde runden (iOS Like)
+            const now = new Date();
+            let h = now.getHours();
+            let m = now.getMinutes() > 30 ? '00' : '30';
+            if(m === '00') h = (h + 1) % 24;
+            document.getElementById('appTime').value = `${h.toString().padStart(2,'0')}:${m}`;
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModalOverlay').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('clientName').value = '';
+                document.getElementById('appEarnings').value = '';
+            }, 300);
+        }
+
+        function saveAppointment() {
+            const clientName = document.getElementById('clientName').value.trim();
+            const date = document.getElementById('appDate').value;
+            const time = document.getElementById('appTime').value;
+            const earnings = document.getElementById('appEarnings').value;
+
+            if (!clientName || !date || !time) return alert('Name, Datum und Startzeit ausfüllen.');
+
+            appointments.push({
+                id: Date.now().toString(),
+                clientName, date, time, earnings,
+                completed: false,
+                logbook: []
+            });
+
+            selectedDate = date; // Springe zum Tag des neuen Termins
+            saveData();
+            closeAddModal();
+        }
+
+        function closeModalsOnBg(e, id) {
+            if (e.target.id === id) document.getElementById(id).classList.remove('active');
+        }
+
+        // --- LOGBUCH MODAL ---
+        function openLogModal(appId) {
+            const app = appointments.find(a => a.id === appId);
+            if(!app) return;
+
+            document.getElementById('currentLogAppId').value = appId;
+            document.getElementById('logTitle').innerText = `Log: ${app.clientName}`;
+            
+            const listEl = document.getElementById('logbookEntries');
+            listEl.innerHTML = '';
+
+            // INTELLIGENZ: Wenn aktuelles Logbuch leer, lade letztes Training dieses Kunden
+            let entriesToRender = app.logbook || [];
+            
+            if (entriesToRender.length === 0) {
+                // Suche alle vergangenen Termine desselben Kunden, sortiere nach Datum absteigend
+                const pastApps = appointments
+                    .filter(a => a.clientName === app.clientName && a.date < app.date && a.logbook && a.logbook.length > 0)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                if (pastApps.length > 0) {
+                    // Kopiere das Logbuch vom letzten Mal
+                    entriesToRender = JSON.parse(JSON.stringify(pastApps[0].logbook));
+                }
+            }
+
+            if (entriesToRender.length === 0) {
+                addLogbookRow(); // Mindestens eine leere Zeile
+            } else {
+                entriesToRender.forEach(entry => addLogbookRow(entry));
+            }
+
+            document.getElementById('logModalOverlay').classList.add('active');
+        }
+
+        function closeLogModal() {
+            document.getElementById('logModalOverlay').classList.remove('active');
+        }
+
+        function addLogbookRow(data = {ex: '', kg: '', rep: '', set: ''}) {
+            const listEl = document.getElementById('logbookEntries');
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            row.innerHTML = `
+                <input type="text" class="ex-name" placeholder="Übung" value="${data.ex}">
+                <input type="number" class="ex-kg" placeholder="0" value="${data.kg}" inputmode="decimal">
+                <input type="number" class="ex-rep" placeholder="0" value="${data.rep}" inputmode="numeric">
+                <input type="number" class="ex-set" placeholder="0" value="${data.set}" inputmode="numeric">
+                <button class="del-btn" onclick="this.parentElement.remove()">✕</button>
+            `;
+            listEl.appendChild(row);
+        }
+
+        function saveLogbook() {
+            const appId = document.getElementById('currentLogAppId').value;
+            const app = appointments.find(a => a.id === appId);
+            if(!app) return;
+
+            const rows = document.querySelectorAll('#logbookEntries .log-row');
+            const newLogbook = [];
+            
+            rows.forEach(row => {
+                const ex = row.querySelector('.ex-name').value.trim();
+                if (ex) { // Nur speichern wenn Übungsname existiert
+                    newLogbook.push({
+                        ex: ex,
+                        kg: row.querySelector('.ex-kg').value,
+                        rep: row.querySelector('.ex-rep').value,
+                        set: row.querySelector('.ex-set').value
+                    });
+                }
+            });
+
+            app.logbook = newLogbook;
+            saveData();
+            closeLogModal();
+        }
+
+        // Init
+        updateUI();
+        
+        // Zentriere Kalender beim Laden
+        setTimeout(() => {
+            const activeDay = document.querySelector('.cal-day.active');
+            if(activeDay) activeDay.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }, 300);
+
     </script>
 </body>
 </html>
