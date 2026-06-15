@@ -39,7 +39,7 @@
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation; /* FIX: Erlaubt natives Scrollen für Swipe-to-Delete */
+            touch-action: manipulation; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -47,6 +47,11 @@
             margin: 0; padding: 0; background-color: var(--system-bg); color: var(--text-main);
             padding-top: env(safe-area-inset-top); padding-bottom: calc(80px + env(safe-area-inset-bottom));
             overflow-x: hidden;
+        }
+
+        @media print {
+            body > *:not(#print-area) { display: none !important; }
+            #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 9999; background: white; }
         }
 
         /* Layout Views */
@@ -64,6 +69,12 @@
         .month-selector { position: relative; display: inline-flex; align-items: center; gap: 4px; color: var(--system-blue); font-size: 15px; font-weight: 600; margin-top: 2px; }
         .month-selector input[type="date"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         .add-btn { color: var(--system-blue); font-size: 32px; background: none; border: none; cursor: pointer; padding: 0; line-height: 1; }
+
+        .sync-btn {
+            background: var(--system-blue); color: white; border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 600; padding: 4px 10px; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; height: 26px;
+        }
 
         /* Account Card */
         .account-card {
@@ -169,7 +180,7 @@
         .autocomplete-dropdown.active { display: block; border-top: 0.5px solid var(--separator); }
         .ac-item { padding: 12px 16px; font-size: 17px; border-bottom: 0.5px solid var(--separator); }
 
-        /* Logbook Form Fixes */
+        /* Logbook Form */
         .logbook-list { display: flex; flex-direction: column; gap: 16px; flex: 1; padding-bottom: 40px; }
         .log-card { background: var(--card-bg); border-radius: 12px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; width: 100%; overflow: hidden; box-sizing: border-box; }
         .log-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; }
@@ -193,11 +204,13 @@
 </head>
 <body>
 
-    <!-- TAB 1: KALENDER -->
     <div id="view-calendar" class="view-section active">
         <header>
             <div class="header-left">
-                <h1>Kalender</h1>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <h1>Kalender</h1>
+                    <button class="sync-btn" onclick="exportICS()">Sync 🗓️</button>
+                </div>
                 <div class="month-selector">
                     <span id="currentMonthLabel">Monat Jahr</span> ▾
                     <input type="date" id="nativeDatePicker" onchange="jumpToDate(event)">
@@ -206,7 +219,6 @@
             <button class="add-btn" onclick="openAddModal()">&#43;</button>
         </header>
 
-        <!-- BLAUE KARTE ZURÜCK IM KALENDER -->
         <div class="account-card">
             <div class="account-label">Verdientes Honorar</div>
             <h2 class="account-value" id="calTotalEarnings">0 €</h2>
@@ -216,7 +228,6 @@
         <div class="list-container" id="appointmentList"></div>
     </div>
 
-    <!-- TAB 2: ABRECHNUNG -->
     <div id="view-billing" class="view-section">
         <header>
             <div class="header-left"><h1>Abrechnung</h1></div>
@@ -236,7 +247,6 @@
         <div class="list-container" id="invoiceList"></div>
     </div>
 
-    <!-- BOTTOM TAB BAR -->
     <nav class="tab-bar">
         <div class="tab-item active" id="tab-cal" onclick="switchView('calendar')">
             <div class="tab-icon">📅</div><span>Kalender</span>
@@ -247,7 +257,6 @@
     </nav>
 
 
-    <!-- HINZUFÜGEN / EDIT MODAL -->
     <div class="modal-overlay" id="addModalOverlay" onclick="closeModalsOnBg(event, 'addModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -269,7 +278,6 @@
         </div>
     </div>
 
-    <!-- LOGBUCH MODAL -->
     <div class="modal-overlay" id="logModalOverlay">
         <div class="full-modal">
             <div class="modal-header">
@@ -284,14 +292,22 @@
     </div>
 
     <script>
+        // --- HELPER: SAFE DATE LOGIC (FIXT ZEITZONEN-BUG) ---
+        function getLocalDateStr(dateObj) {
+            if (!dateObj) dateObj = new Date();
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
         // --- DATA STATE ---
         let appointments = JSON.parse(localStorage.getItem('pt_pro_v3_data')) || [];
         let invoices = JSON.parse(localStorage.getItem('pt_pro_v3_invoices')) || [];
-        let selectedDate = new Date().toISOString().split('T')[0];
+        let selectedDate = getLocalDateStr(); // Safe Init
         let pendingSmartLogbook = []; 
         let touchTimer = null; 
 
-        // --- HELPER ---
         function getEndTime(startTime) {
             if(!startTime) return "";
             let [h, m] = startTime.split(':').map(Number);
@@ -308,11 +324,9 @@
             renderBillingView();
         }
 
-        // --- NAVIGATION ---
         function switchView(view) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-            
             if(view === 'calendar') {
                 document.getElementById('view-calendar').classList.add('active');
                 document.getElementById('tab-cal').classList.add('active');
@@ -324,14 +338,11 @@
             }
         }
 
-        // --- ACCOUNT CARDS UPDATE ---
         function updateAccountCards() {
-            // Kalender Übersicht (Alle abgeschlossenen)
             const calTotal = appointments.reduce((sum, app) => app.completed ? sum + Number(app.earnings || 0) : sum, 0);
             const calTotalEl = document.getElementById('calTotalEarnings');
             if(calTotalEl) calTotalEl.innerText = formatCurrency(calTotal);
 
-            // Abrechnung Übersicht (Offen, aber abgeschlossen)
             const openApps = appointments.filter(a => a.completed && !a.billed);
             const openTotal = openApps.reduce((sum, a) => sum + Number(a.earnings || 0), 0);
             const openEl = document.getElementById('openEarnings');
@@ -346,11 +357,11 @@
             
             const today = new Date(); today.setHours(0,0,0,0);
             const startDate = new Date(today); startDate.setDate(startDate.getDate() - 90);
-            const todayStr = today.toISOString().split('T')[0];
+            const todayStr = getLocalDateStr(today);
 
             for (let i = 0; i <= 270; i++) {
                 const d = new Date(startDate); d.setDate(d.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = getLocalDateStr(d);
                 const appsOnDay = appointments.filter(a => a.date === dateStr).length;
                 
                 let dotsHtml = '';
@@ -381,11 +392,8 @@
             renderAppointments();
         }
 
-        function jumpToDate(e) {
-            if(e.target.value) { selectedDate = e.target.value; renderCalendarView(true); }
-        }
+        function jumpToDate(e) { if(e.target.value) { selectedDate = e.target.value; renderCalendarView(true); } }
 
-        // --- APPOINTMENT LIST & SMART GESTURE HANDLING ---
         function renderAppointments() {
             const listEl = document.getElementById('appointmentList');
             listEl.innerHTML = '';
@@ -397,7 +405,6 @@
                 const el = document.createElement('div');
                 el.className = 'swipe-item';
                 
-                // GESTURE FIX: event obj wird direkt übergeben, um z.B. Toggle-Klicks herauszufiltern
                 el.innerHTML = `
                     <div class="swipe-content" 
                          ontouchstart="handleTouchStart(event, '${app.id}')" 
@@ -409,7 +416,7 @@
                          onmouseleave="handleTouchMove(event)">
                         <div class="card-main">
                             <div class="card-time">${app.time} – ${getEndTime(app.time)} Uhr</div>
-                            <h3 class="card-name">${app.clientName} ${app.billed ? '✅ (Abgerechnet)' : ''}</h3>
+                            <h3 class="card-name">${app.clientName} ${app.billed ? '✅' : ''}</h3>
                             <div class="card-earnings">Honorar: ${formatCurrency(app.earnings || 0)}</div>
                         </div>
                         <div class="toggle-wrapper" onclick="toggleComplete(event, '${app.id}')">
@@ -423,21 +430,18 @@
             });
         }
 
-        // SMART TOUCH LOGIC FIX
+        // --- SMART GESTURE HANDLING ---
         let isLongPress = false;
         let startX = 0, startY = 0, isScrolling = false;
 
         function handleTouchStart(e, id) {
-            if(e.target.closest('.toggle-wrapper')) return; // Wenn der Toggle berührt wird, ignoriere es für Long Press
-            
+            if(e.target.closest('.toggle-wrapper')) return; 
             startX = e.touches ? e.touches[0].clientX : e.clientX;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
-            isScrolling = false;
-            isLongPress = false;
+            isScrolling = false; isLongPress = false;
 
             touchTimer = setTimeout(() => {
-                isLongPress = true;
-                openEditModal(id);
+                isLongPress = true; openEditModal(id);
             }, 500); 
         }
 
@@ -445,41 +449,92 @@
             if(!startX) return;
             let curX = e.touches ? e.touches[0].clientX : e.clientX;
             let curY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            // Wenn der Nutzer wischt/scrollt, brich den Long-Press Timer ab
             if(Math.abs(curX - startX) > 10 || Math.abs(curY - startY) > 10) {
-                isScrolling = true;
-                clearTimeout(touchTimer);
+                isScrolling = true; clearTimeout(touchTimer);
             }
         }
 
         function handleTouchEnd(e, id) {
             clearTimeout(touchTimer);
-            if(e.target.closest('.toggle-wrapper')) return; // Wenn Toggle gedrückt, mache nichts (wird vom onclick erledigt)
-
-            // Wenn es kein langer Druck und kein Scrollen/Wischen war -> Logbuch öffnen
-            if(!isLongPress && !isScrolling) {
-                openLogModal(id);
-            }
+            if(e.target.closest('.toggle-wrapper')) return; 
+            if(!isLongPress && !isScrolling) openLogModal(id);
         }
 
-        // TOGGLE FIX
         function toggleComplete(e, id) {
-            if(e) e.stopPropagation(); // Stoppt Event-Bubbling sauber
+            if(e) e.stopPropagation(); 
             const app = appointments.find(a => a.id === id);
             if(app) { 
                 if(app.billed) return alert("Bereits abgerechnet. Status kann nicht geändert werden.");
-                app.completed = !app.completed; 
-                saveData(); 
+                app.completed = !app.completed; saveData(); 
             }
         }
 
         function deleteAppointment(id) {
             const app = appointments.find(a => a.id === id);
-            if(app && app.billed) return alert("Dieser Termin ist bereits auf einer Rechnung und kann nicht gelöscht werden. Storniere erst die Rechnung.");
-            
+            if(app && app.billed) return alert("Dieser Termin ist auf einer Rechnung. Storniere erst die Rechnung.");
             appointments = appointments.filter(a => a.id !== id);
             saveData();
+        }
+
+        // --- EXPORT FUNKTIONEN ---
+        function exportICS() {
+            let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PT Tracker//DE\n";
+            appointments.forEach(app => {
+                const [y, m, d] = app.date.split('-');
+                const [h, min] = app.time.split(':');
+                let endH = parseInt(h) + 1;
+                let endStr = `${y}${m}${d}T${String(endH).padStart(2,'0')}${min}00`;
+                let startStr = `${y}${m}${d}T${h}${min}00`;
+                
+                icsMSG += "BEGIN:VEVENT\n";
+                icsMSG += `SUMMARY:PT mit ${app.clientName}\n`;
+                icsMSG += `DTSTART;TZID=Europe/Berlin:${startStr}\n`;
+                icsMSG += `DTEND;TZID=Europe/Berlin:${endStr}\n`;
+                icsMSG += "END:VEVENT\n";
+            });
+            icsMSG += "END:VCALENDAR";
+
+            const blob = new Blob([icsMSG], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'pt_termine.ics';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportInvoicePDF(invId) {
+            const inv = invoices.find(i => i.id === invId);
+            if(!inv) return;
+
+            const printArea = document.createElement('div');
+            printArea.id = 'print-area';
+            
+            let itemsHtml = '';
+            inv.items.forEach(item => {
+                itemsHtml += `
+                    <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
+                        <div><strong style="font-size:18px;">${item.clientName}</strong><br><span style="color:#666; font-size:15px;">${formatDateDE(item.date)} • ${item.time} Uhr</span></div>
+                        <div style="font-weight:bold; font-size:18px;">${formatCurrency(item.earnings || 0)}</div>
+                    </div>
+                `;
+            });
+
+            printArea.innerHTML = `
+                <div style="font-family: -apple-system, sans-serif; padding: 30px; color: black; background: white;">
+                    <h1 style="color:#007AFF; margin-bottom: 5px;">Abrechnung #${inv.id.toString().slice(-4)}</h1>
+                    <p style="color:#666; margin-top: 0; margin-bottom: 40px; font-size: 18px;">Erstellt am: ${formatDateDE(inv.date)}</p>
+                    <div style="border-top: 2px solid #000; padding-top: 10px;">
+                        ${itemsHtml}
+                    </div>
+                    <div style="text-align:right; font-size:24px; font-weight:bold; margin-top:30px; border-top: 2px solid #000; padding-top: 10px;">
+                        Gesamtsumme: ${formatCurrency(inv.total)}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(printArea);
+            window.print();
+            setTimeout(() => { document.body.removeChild(printArea); }, 500);
         }
 
         // --- ADD / EDIT MODAL ---
@@ -627,10 +682,10 @@
                     el.className = 'invoice-card';
                     
                     let itemsHtml = '';
-                    inv.items.forEach((item, index) => {
+                    inv.items.forEach((item) => {
                         itemsHtml += `
                             <div class="invoice-item">
-                                <div>${item.clientName} (${formatDateDE(item.date)})</div>
+                                <div>${item.clientName} <br><span style="font-size:13px;">${formatDateDE(item.date)} • ${item.time} Uhr</span></div>
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     ${formatCurrency(item.earnings || 0)}
                                     <button class="invoice-item-del" onclick="removeSubItemFromInvoice(${inv.id}, '${item.appId}')">✕</button>
@@ -645,9 +700,12 @@
                                 <div class="invoice-title">Abrechnung #${inv.id.toString().slice(-4)}</div>
                                 <div style="font-size:12px; color:var(--text-muted)">Erstellt: ${formatDateDE(inv.date)}</div>
                             </div>
-                            <div style="text-align:right;">
+                            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
                                 <div class="invoice-total">${formatCurrency(inv.total)}</div>
-                                <button class="btn-text" style="color:var(--system-red); font-size:13px; padding:0;" onclick="deleteInvoice(${inv.id})">Rechnung löschen</button>
+                                <div style="display:flex; gap:12px;">
+                                    <button class="btn-text" style="color:var(--system-blue); font-size:13px; padding:0;" onclick="exportInvoicePDF(${inv.id})">PDF/Drucken</button>
+                                    <button class="btn-text" style="color:var(--system-red); font-size:13px; padding:0;" onclick="deleteInvoice(${inv.id})">Löschen</button>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top: 10px;">${itemsHtml}</div>
@@ -667,7 +725,7 @@
             
             const newInvoice = {
                 id: Date.now(),
-                date: new Date().toISOString().split('T')[0],
+                date: getLocalDateStr(),
                 total: total,
                 items: openApps.map(a => ({
                     appId: a.id,
