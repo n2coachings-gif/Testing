@@ -211,13 +211,13 @@
 </head>
 <body>
 
-    <!-- TAB 1: KALENDER -->
     <div id="view-calendar" class="view-section active">
         <header>
             <div class="header-left">
-                <div style="display:flex; align-items:center; gap:12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
                     <h1>Kalender</h1>
                     <button class="sync-btn" onclick="exportICS()">Sync 🗓️</button>
+                    <button class="sync-btn" onclick="openDataModal()" style="background: var(--text-muted);">⚙️</button>
                 </div>
                 <div class="month-selector">
                     <span id="currentMonthLabel">Monat Jahr</span> ▾
@@ -240,7 +240,6 @@
         <div class="list-container" id="appointmentList"></div>
     </div>
 
-    <!-- TAB 2: ABRECHNUNG -->
     <div id="view-billing" class="view-section">
         <header>
             <div class="header-left"><h1>Abrechnung</h1></div>
@@ -264,7 +263,6 @@
         <div class="list-container" id="invoiceList"></div>
     </div>
 
-    <!-- BOTTOM TAB BAR -->
     <nav class="tab-bar">
         <div class="tab-item active" id="tab-cal" onclick="switchView('calendar')">
             <div class="tab-icon">📅</div><span>Kalender</span>
@@ -275,7 +273,6 @@
     </nav>
 
 
-    <!-- HINZUFÜGEN / EDIT MODAL -->
     <div class="modal-overlay" id="addModalOverlay" onclick="closeModalsOnBg(event, 'addModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -297,7 +294,6 @@
         </div>
     </div>
 
-    <!-- DETAILS BREAKDOWN MODAL -->
     <div class="modal-overlay" id="breakdownModalOverlay" onclick="closeModalsOnBg(event, 'breakdownModalOverlay')">
         <div class="sheet-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -306,12 +302,28 @@
                 <button class="modal-btn right" onclick="closeBreakdownModal()">Fertig</button>
             </div>
             <div class="details-scroll-area" id="breakdownList">
-                <!-- Wird dynamisch befüllt -->
+                </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="dataModalOverlay" onclick="closeModalsOnBg(event, 'dataModalOverlay')">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-btn left" onclick="closeDataModal()">Schließen</button>
+                <h3>Daten-Transfer</h3>
+                <div style="width: 80px;"></div>
+            </div>
+            <div style="padding-bottom: 20px; text-align: center; color: var(--text-muted); font-size: 14px;">
+                1. In Safari auf "Code Kopieren" drücken.<br>2. App auf dem Home-Bildschirm öffnen, Text einfügen & auf "Importieren" drücken.
+            </div>
+            <textarea id="dataTransferArea" style="width: 100%; height: 100px; border-radius: 12px; border: 1px solid var(--separator); background: var(--system-bg); color: var(--text-main); padding: 12px; font-family: monospace; font-size: 11px; margin-bottom: 16px;" placeholder="Code hier einfügen..."></textarea>
+            <div style="display: flex; gap: 12px;">
+                <button class="add-log-btn" style="background: var(--system-blue); color: white;" onclick="exportAppData()">Code Kopieren</button>
+                <button class="add-log-btn" style="background: var(--system-green); color: white;" onclick="importAppData()">Importieren</button>
             </div>
         </div>
     </div>
 
-    <!-- LOGBUCH MODAL -->
     <div class="modal-overlay" id="logModalOverlay">
         <div class="full-modal">
             <div class="modal-header">
@@ -338,7 +350,7 @@
         // --- DATA STATE ---
         let appointments = JSON.parse(localStorage.getItem('pt_pro_v3_data')) || [];
         let invoices = JSON.parse(localStorage.getItem('pt_pro_v3_invoices')) || [];
-        let deletedAppIds = JSON.parse(localStorage.getItem('pt_pro_v3_deleted')) || []; // NEU: Für Kalender-Löschungen
+        let deletedAppIds = JSON.parse(localStorage.getItem('pt_pro_v3_deleted')) || []; 
         let selectedDate = getLocalDateStr(); 
         let pendingSmartLogbook = []; 
         let touchTimer = null; 
@@ -389,6 +401,49 @@
             if(openEl) openEl.innerText = formatCurrency(openTotal);
             const openHoursEl = document.getElementById('openTotalHours');
             if(openHoursEl) openHoursEl.innerText = hourText;
+        }
+
+        // --- DATA TRANSFER MODAL ---
+        function openDataModal() {
+            document.getElementById('dataTransferArea').value = '';
+            document.getElementById('dataModalOverlay').classList.add('active');
+        }
+        function closeDataModal() {
+            document.getElementById('dataModalOverlay').classList.remove('active');
+        }
+        function exportAppData() {
+            const backup = { appointments, invoices, deletedAppIds };
+            const jsonStr = JSON.stringify(backup);
+            document.getElementById('dataTransferArea').value = jsonStr;
+            
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                alert("Daten erfolgreich kopiert! Öffne nun die App auf dem Home-Bildschirm und füge sie dort ein.");
+            }).catch(err => {
+                const textArea = document.getElementById('dataTransferArea');
+                textArea.select();
+                document.execCommand('copy');
+                alert("Daten kopiert!");
+            });
+        }
+        function importAppData() {
+            const jsonStr = document.getElementById('dataTransferArea').value.trim();
+            if(!jsonStr) return alert("Bitte füge zuerst den Code ein.");
+            try {
+                const backup = JSON.parse(jsonStr);
+                if(backup.appointments && backup.invoices) {
+                    appointments = backup.appointments;
+                    invoices = backup.invoices;
+                    deletedAppIds = backup.deletedAppIds || [];
+                    saveData();
+                    alert("Import erfolgreich! Die App wird nun aktualisiert.");
+                    closeDataModal();
+                    location.reload();
+                } else {
+                    alert("Ungültiges Format.");
+                }
+            } catch(e) {
+                alert("Fehler beim Lesen der Daten. Bitte überprüfe den eingefügten Code.");
+            }
         }
 
         // --- BREAKDOWN MODAL ---
@@ -547,7 +602,7 @@
             if(app && app.billed) return alert("Dieser Termin ist auf einer Rechnung. Storniere erst die Rechnung.");
             
             if(!deletedAppIds.includes(id)) {
-                deletedAppIds.push(id); // Speichern für den nächsten ICS Sync (Storno an Apple)
+                deletedAppIds.push(id); 
             }
             
             appointments = appointments.filter(a => a.id !== id);
@@ -559,7 +614,6 @@
             let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PT Tracker//DE\nCALSCALE:GREGORIAN\n";
             const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + "Z";
             
-            // 1. Alle aktiven Termine exportieren (erstellt oder überschreibt alte)
             appointments.forEach(app => {
                 const [y, m, d] = app.date.split('-');
                 const [h, min] = app.time.split(':');
@@ -576,12 +630,11 @@
                 icsMSG += "END:VEVENT\n";
             });
 
-            // 2. Alle gelöschten Termine exportieren (Zwingt Apple Kalender zum Löschen)
             deletedAppIds.forEach(id => {
                 icsMSG += "BEGIN:VEVENT\n";
                 icsMSG += `UID:${id}@pttracker\n`;
                 icsMSG += `DTSTAMP:${now}\n`;
-                icsMSG += `STATUS:CANCELLED\n`; // Dieser Code löscht es beim Import!
+                icsMSG += `STATUS:CANCELLED\n`; 
                 icsMSG += "END:VEVENT\n";
             });
 
