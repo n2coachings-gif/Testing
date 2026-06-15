@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/007AFF/FFFFFF?text=PT">
+    <title>PT Tracker</title>
+    <style>
+        :root {
+            --system-blue: #007AFF;
+            --system-red: #FF3B30;
+            --system-bg: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-main: #000000;
+            --text-muted: #8E8E93;
+            --separator: rgba(60, 60, 67, 0.18);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --system-blue: #0A84FF;
+                --system-red: #FF453A;
+                --system-bg: #000000;
+                --card-bg: #1C1C1E;
+                --text-main: #FFFFFF;
+                --text-muted: #EBEBF599;
+                --separator: rgba(84, 84, 88, 0.65);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--system-bg);
+            color: var(--text-main);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            overflow-x: hidden;
+        }
+
+        /* Navigation Bar */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: var(--system-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(242, 242, 247, 0.8);
+            border-bottom: 0.5px solid var(--separator);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header {
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .add-btn {
+            color: var(--system-blue);
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 300;
+            padding: 0;
+        }
+
+        /* Liste */
+        .appointment-list {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+            opacity: 0.8;
+        }
+
+        .card-info h2 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .card-info p {
+            margin: 0;
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            color: var(--system-red);
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 8px 0 8px 16px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background-color: var(--system-bg);
+            width: 100%;
+            border-radius: 18px 18px 0 0;
+            padding: 20px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .modal-close, .modal-save {
+            background: none;
+            border: none;
+            font-size: 17px;
+            color: var(--system-blue);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .modal-save {
+            font-weight: 600;
+        }
+
+        /* Formular */
+        .form-group {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--separator);
+            align-items: center;
+        }
+
+        .form-row:last-child {
+            border-bottom: none;
+        }
+
+        .form-row label {
+            width: 90px;
+            font-size: 17px;
+            color: var(--text-main);
+        }
+
+        .form-row input {
+            flex: 1;
+            border: none;
+            font-size: 17px;
+            outline: none;
+            background: transparent;
+            -webkit-user-select: auto;
+            user-select: auto;
+            color: var(--text-main);
+            text-align: right;
+        }
+        
+        .form-row input::placeholder {
+            color: var(--text-muted);
+        }
+
+        input[type="date"], input[type="time"] {
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 60px 20px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Termine</h1>
+        <button class="add-btn" onclick="openModal()">&#43;</button>
+    </header>
+
+    <div class="appointment-list" id="appointmentList">
+        </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeModal()">Abbrechen</button>
+                <h3>Neuer Termin</h3>
+                <button class="modal-save" onclick="saveAppointment()">Sichern</button>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Kunde</label>
+                    <input type="text" id="clientName" placeholder="Name">
+                </div>
+                <div class="form-row">
+                    <label>Datum</label>
+                    <input type="date" id="appDate">
+                </div>
+                <div class="form-row">
+                    <label>Uhrzeit</label>
+                    <input type="time" id="appTime">
+                </div>
+                <div class="form-row">
+                    <label>Dauer</label>
+                    <input type="text" id="appDuration" placeholder="z.B. 60 Min">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lokaler Speicher initialisieren
+        let appointments = JSON.parse(localStorage.getItem('pt_tracker_data')) || [];
+
+        // DOM Elemente
+        const listEl = document.getElementById('appointmentList');
+        const modalOverlay = document.getElementById('modalOverlay');
+        
+        const clientNameInput = document.getElementById('clientName');
+        const appDateInput = document.getElementById('appDate');
+        const appTimeInput = document.getElementById('appTime');
+        const appDurationInput = document.getElementById('appDuration');
+
+        // Render Funktion
+        function renderAppointments() {
+            listEl.innerHTML = '';
+            
+            if (appointments.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">Keine anstehenden Termine.<br>Tippe oben rechts auf das + um zu starten.</div>';
+                return;
+            }
+
+            // Nach Datum & Uhrzeit sortieren
+            appointments.sort((a, b) => {
+                const dateA = new Date(`${a.date}T${a.time}`);
+                const dateB = new Date(`${b.date}T${b.time}`);
+                return dateA - dateB;
+            });
+
+            appointments.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // Datum formatieren
+                const dateObj = new Date(`${app.date}T${app.time}`);
+                const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                const timeStr = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+                card.innerHTML = `
+                    <div class="card-info">
+                        <h2>${app.clientName}</h2>
+                        <p>${dateStr}, ${timeStr} Uhr • ${app.duration}</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteAppointment('${app.id}')">Löschen</button>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        // Modal Steuerung
+        function openModal() {
+            modalOverlay.classList.add('active');
+            
+            // Standardmäßig heutiges Datum setzen, wenn leer
+            if (!appDateInput.value) {
+                const today = new Date();
+                appDateInput.value = today.toISOString().split('T')[0];
+            }
+            
+            // Setze Fokus kurz verzögert (bessere iOS UX)
+            setTimeout(() => {
+                clientNameInput.focus();
+            }, 300);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            // Formular zurücksetzen, sobald die Animation beendet ist
+            setTimeout(clearForm, 300);
+        }
+
+        function closeModalOnBg(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        }
+
+        function clearForm() {
+            clientNameInput.value = '';
+            appDateInput.value = '';
+            appTimeInput.value = '';
+            appDurationInput.value = '';
+        }
+
+        // Datenspeicherung
+        function saveAppointment() {
+            const clientName = clientNameInput.value.trim();
+            const date = appDateInput.value;
+            const time = appTimeInput.value;
+            const duration = appDurationInput.value.trim() || '60 Min';
+
+            if (!clientName || !date || !time) {
+                alert('Bitte Name, Datum und Uhrzeit ausfüllen.');
+                return;
+            }
+
+            const newAppointment = {
+                id: Date.now().toString(), // Simpler Unique ID Generator
+                clientName,
+                date,
+                time,
+                duration
+            };
+
+            appointments.push(newAppointment);
+            localStorage.setItem('pt_tracker_data', JSON.stringify(appointments));
+            
+            closeModal();
+            renderAppointments();
+        }
+
+        function deleteAppointment(id) {
+            // Nativen iOS-Dialog simulieren
+            if (confirm('Möchtest du diesen Termin wirklich löschen?')) {
+                appointments = appointments.filter(app => app.id !== id);
+                localStorage.setItem('pt_tracker_data', JSON.stringify(appointments));
+                renderAppointments();
+            }
+        }
+
+        // Init beim Laden
+        renderAppointments();
+    </script>
+</body>
+</html>
