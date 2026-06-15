@@ -292,7 +292,7 @@
     </div>
 
     <script>
-        // --- HELPER: SAFE DATE LOGIC (FIXT ZEITZONEN-BUG) ---
+        // --- HELPER: SAFE DATE LOGIC ---
         function getLocalDateStr(dateObj) {
             if (!dateObj) dateObj = new Date();
             const y = dateObj.getFullYear();
@@ -304,7 +304,7 @@
         // --- DATA STATE ---
         let appointments = JSON.parse(localStorage.getItem('pt_pro_v3_data')) || [];
         let invoices = JSON.parse(localStorage.getItem('pt_pro_v3_invoices')) || [];
-        let selectedDate = getLocalDateStr(); // Safe Init
+        let selectedDate = getLocalDateStr(); 
         let pendingSmartLogbook = []; 
         let touchTimer = null; 
 
@@ -476,9 +476,16 @@
             saveData();
         }
 
-        // --- EXPORT FUNKTIONEN ---
+        // --- EXPORT FUNKTIONEN (Bugfix Apple/Google Standard) ---
         function exportICS() {
-            let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PT Tracker//DE\n";
+            if (appointments.length === 0) return alert("Keine Termine zum Exportieren vorhanden.");
+            
+            // Standardisierter Header für maximale Kompatibilität
+            let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PT Tracker//DE\nCALSCALE:GREGORIAN\n";
+            
+            // Erstelle einen gültigen DTSTAMP (Zeitpunkt des Exports im UTC-Format YYYYMMDDTHHMMSSZ)
+            const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + "Z";
+            
             appointments.forEach(app => {
                 const [y, m, d] = app.date.split('-');
                 const [h, min] = app.time.split(':');
@@ -487,6 +494,9 @@
                 let startStr = `${y}${m}${d}T${h}${min}00`;
                 
                 icsMSG += "BEGIN:VEVENT\n";
+                // ZWINGEND NOTWENDIG für Apple Kalender: Eindeutige ID und Timestamp
+                icsMSG += `UID:${app.id}@pttracker\n`;
+                icsMSG += `DTSTAMP:${now}\n`;
                 icsMSG += `SUMMARY:PT mit ${app.clientName}\n`;
                 icsMSG += `DTSTART;TZID=Europe/Berlin:${startStr}\n`;
                 icsMSG += `DTEND;TZID=Europe/Berlin:${endStr}\n`;
@@ -512,9 +522,13 @@
             
             let itemsHtml = '';
             inv.items.forEach(item => {
+                let endStr = getEndTime(item.time); // Zeit + 1 Stunde
                 itemsHtml += `
                     <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
-                        <div><strong style="font-size:18px;">${item.clientName}</strong><br><span style="color:#666; font-size:15px;">${formatDateDE(item.date)} • ${item.time} Uhr</span></div>
+                        <div>
+                            <strong style="font-size:18px;">${item.clientName}</strong><br>
+                            <span style="color:#666; font-size:15px;">${formatDateDE(item.date)} • ${item.time} - ${endStr} Uhr (60 Min)</span>
+                        </div>
                         <div style="font-weight:bold; font-size:18px;">${formatCurrency(item.earnings || 0)}</div>
                     </div>
                 `;
@@ -683,9 +697,10 @@
                     
                     let itemsHtml = '';
                     inv.items.forEach((item) => {
+                        let endStr = getEndTime(item.time); // Zeitberechnung eingefügt
                         itemsHtml += `
                             <div class="invoice-item">
-                                <div>${item.clientName} <br><span style="font-size:13px;">${formatDateDE(item.date)} • ${item.time} Uhr</span></div>
+                                <div>${item.clientName} <br><span style="font-size:13px;">${formatDateDE(item.date)} • ${item.time} - ${endStr} Uhr (60 Min)</span></div>
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     ${formatCurrency(item.earnings || 0)}
                                     <button class="invoice-item-del" onclick="removeSubItemFromInvoice(${inv.id}, '${item.appId}')">✕</button>
