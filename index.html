@@ -545,6 +545,23 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
   .training-stop-btn{min-width:auto;padding:12px 15px}
 }
 
+
+/* Dedicated print rules for mobile Safari and desktop. */
+.invoice-print{max-width:980px;margin:0 auto;background:white;color:#222;padding:34px;font-family:Arial,Helvetica,sans-serif}
+.invoice-print header{margin-bottom:24px}
+.invoice-print h1{font-size:23px;margin:0 0 7px;color:#6B4A33}
+.invoice-print p{font-size:12px;color:#666}
+.invoice-print table{width:100%;border-collapse:collapse;font-size:12px;margin:24px 0}
+.invoice-print th{background:#F1EFED;text-align:left;padding:11px;border-bottom:1px solid #ccc}
+.invoice-print td{padding:13px 11px;border-bottom:1px solid #ddd}
+.invoice-disclaimer{margin-top:34px}
+@media print{
+ @page{size:A4;margin:0}
+ html,body{background:white!important;height:auto!important;overflow:visible!important}
+ #print-area{position:static!important;width:100%!important;display:block!important}
+ .invoice-print{box-shadow:none;max-width:none}
+ .invoice-print tr{break-inside:avoid}
+}
 </style>
  </head>
  <body>
@@ -962,16 +979,116 @@ const start=dateObj(selectedDate);start.setDate(start.getDate()-3);let h='';for(
 let todays=appointments.filter(a=>a.date===selectedDate).sort((a,b)=>String(a.time).localeCompare(String(b.time)));
 $('appointments').innerHTML=todays.length?todays.map(a=>`<article class="card ap-card" data-id="${esc(a.id)}"><div class="avatar">${esc(a.clientName.slice(0,2).toUpperCase())}</div><div class="grow"><div class="tiny sub">${esc(a.time)} Uhr · ${cash(a.earnings)}</div><h3>${esc(a.clientName)}</h3><div class="row" style="gap:10px;flex-wrap:wrap"><button class="link" data-act="train">Training öffnen ↗</button><button class="link" data-act="edit">Bearbeiten</button><button class="link danger" data-act="delete">Löschen</button></div></div><button class="status ${a.completed?'done':''}" data-act="done">${a.billed?'Abgerechnet':a.completed?'Erledigt ✓':'Offen'}</button></article>`).join(''):'<div class="empty">Keine Termine an diesem Tag.</div>'}
 function renderBilling(){const open=openTotal(),ids=new Set(open.map(a=>a.id));billingSelection=new Set([...billingSelection].filter(id=>ids.has(id)));$('billAmount').textContent=cash(open.reduce((v,a)=>v+Number(a.earnings||0),0));$('billCount').textContent=`${open.length} Stunden`;$('openItems').innerHTML=open.length?open.map(a=>`<div class="card row"><input class="check" type="checkbox" data-bill="${esc(a.id)}" ${billingSelection.has(a.id)?'checked':''}><div class="grow"><strong>${esc(a.clientName)}</strong><div class="sub">${niceDate(a.date)} · ${esc(a.time)} Uhr</div></div><strong>${cash(a.earnings)}</strong></div>`).join(''):'<div class="empty">Keine offenen Posten vorhanden.</div>';$('invoiceButton').disabled=!billingSelection.size;$('invoiceButton').textContent=`${billingSelection.size} abrechnen`;
-$('invoices').innerHTML=[...invoices].reverse().map(inv=>`<div class="card" data-invoice="${esc(inv.id)}"><div class="row between"><div><strong>Abrechnung #${esc(String(inv.id).slice(-6))}</strong><div class="sub">${niceDate(inv.date)} · ${inv.items.length} Positionen</div></div><strong>${cash(inv.total)}</strong></div><div class="divider"></div>${inv.items.map(item=>`<div class="row between" style="margin:8px 0"><span class="tiny">${esc(item.clientName)} · ${niceDate(item.date)}</span><span class="tiny">${cash(item.earnings)} <button class="remove" data-invact="removeItem" data-item="${esc(item.appId)}">×</button></span></div>`).join('')}<div class="actions"><button class="btn secondary small" data-invact="print">PDF / Drucken</button><button class="btn text small danger" data-invact="delete">Löschen</button></div></div>`).join('')||'<div class="empty">Noch keine Abrechnungen erstellt.</div>'}
+$('invoices').innerHTML=[...invoices].reverse().map(inv=>`<div class="card" data-invoice="${esc(inv.id)}"><div class="row between"><div><strong>Abrechnung #${esc(String(inv.id).slice(-6))}</strong><div class="sub">${niceDate(inv.date)} · ${inv.items.length} Positionen</div></div><strong>${cash(inv.total)}</strong></div><div class="divider"></div>${inv.items.map(item=>`<div class="row between" style="margin:8px 0"><span class="tiny">${esc(item.clientName)} · ${niceDate(item.date)}</span><span class="tiny">${cash(item.earnings)} <button class="remove" data-invact="removeItem" data-item="${esc(item.appId)}">×</button></span></div>`).join('')}<div class="actions"><button class="btn secondary small" data-invact="pdf">PDF speichern</button><button class="btn secondary small" data-invact="print">Drucken</button><button class="btn text small danger" data-invact="delete">Löschen</button></div></div>`).join('')||'<div class="empty">Noch keine Abrechnungen erstellt.</div>'}
 function catalog(){let m=new Map();personalExercises.filter(n=>typeof n==='string'&&norm(n)).forEach(name=>m.set(norm(name),{name,manual:true,sessions:0,clients:new Set()}));appointments.forEach(a=>(Array.isArray(a.logbook)?a.logbook:[]).forEach(e=>{if(!norm(e.ex))return;let k=norm(e.ex),v=m.get(k)||{name:e.ex,manual:false,sessions:0,clients:new Set()};v.sessions++;v.clients.add(a.clientName);m.set(k,v)}));return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name,'de'))}
 function renderLibrary(){const all=catalog(),q=norm($('librarySearch').value);$('libraryCount').textContent=`${all.length} Übungen`;let filtered=all.filter(x=>norm(x.name).includes(q)||[...x.clients].some(c=>norm(c).includes(q)));$('libraryItems').innerHTML=filtered.map(e=>`<div class="library-item" data-name="${esc(encodeURIComponent(e.name))}"><div class="lib-symbol">↗</div><div class="grow"><button class="link" data-lib="history" style="font-size:15px;color:var(--graphite)">${esc(e.name)}</button><div class="spark">${e.sessions} Trainingseinträge · ${e.clients.size} Kunden</div></div>${e.manual?'<button class="btn secondary small" data-lib="edit">Ändern</button><button class="remove" data-lib="delete">×</button>':''}<button class="btn secondary small" data-lib="history">Verlauf</button></div>`).join('')||'<div class="empty">Keine Übungen vorhanden.</div>'}
 function openAppointment(id=null){editingId=id;feeManual=false;let a=appointments.find(x=>x.id===id);if(a?.billed)return alert('Abgerechnete Termine sind gesperrt.');$('appointmentTitle').textContent=a?'Termin bearbeiten':'Neuer Termin';$('client').value=a?.clientName||'';$('appDate').value=a?.date||selectedDate;$('appTime').value=a?.time||'10:00';$('appFee').value=a?.earnings??'';show('appointmentModal')}
 function suggestFee(){if(editingId||feeManual)return;const n=norm($('client').value),recent=appointments.filter(a=>norm(a.clientName)===n).sort((a,b)=>b.date.localeCompare(a.date)||String(b.time).localeCompare(String(a.time)))[0];if(recent)$('appFee').value=recent.earnings??''}
-function saveAppointment(){let clientName=$('client').value.trim(),date=$('appDate').value,time=$('appTime').value,fee=$('appFee').value;if(!clientName||!date||!time)return alert('Kunde, Datum und Startzeit ausfüllen.');if(fee!==''&&(!Number.isFinite(Number(fee))||Number(fee)<0))return alert('Ungültiges Honorar.');if(editingId){let a=appointments.find(a=>a.id===editingId);if(!a||a.billed)return;Object.assign(a,{clientName,date,time,earnings:fee||0})}else{let recent=appointments.filter(a=>norm(a.clientName)===norm(clientName)).sort((a,b)=>b.date.localeCompare(a.date))[0];appointments.push({id:uuid(),clientName,date,time,earnings:fee||0,completed:false,billed:false,logbook:recent?.logbook?JSON.parse(JSON.stringify(recent.logbook)):[]})}selectedDate=date;hide('appointmentModal');persist()}
+function saveAppointment(){let clientName=$('client').value.trim(),date=$('appDate').value,time=$('appTime').value,fee=$('appFee').value;if(!clientName||!date||!time)return alert('Kunde, Datum und Startzeit ausfüllen.');if(fee!==''&&(!Number.isFinite(Number(fee))||Number(fee)<0))return alert('Ungültiges Honorar.');if(editingId){let a=appointments.find(a=>a.id===editingId);if(!a||a.billed)return;Object.assign(a,{clientName,date,time,earnings:fee||0})}else{let recent=appointments.filter(a=>norm(a.clientName)===norm(clientName)).sort((a,b)=>b.date.localeCompare(a.date))[0];appointments.push({id:uuid(),clientName,date,time,earnings:fee||0,completed:false,billed:false,logbook:recent?.logbook?JSON.parse(JSON.stringify(recent.logbook)).map(e=>({...e,detailedSets:(e.detailedSets||[]).map(s=>({...s,done:false}))})):[]})}selectedDate=date;hide('appointmentModal');persist()}
 function handleAppointment(id,action){let a=appointments.find(x=>x.id===id);if(!a)return;if(action==='train')return openTraining(id);if(action==='edit')return openAppointment(id);if(a.billed)return alert('Abgerechneter Termin gesperrt. Zuerst Abrechnung stornieren.');if(action==='done'){a.completed=!a.completed;if(a.completed)billingSelection.add(a.id);else billingSelection.delete(a.id);persist()}if(action==='delete'&&confirm('Termin wirklich löschen?')){deletedAppIds.push(id);appointments=appointments.filter(x=>x.id!==id);billingSelection.delete(id);persist()}}
 function createInvoice(){let apps=openTotal().filter(x=>billingSelection.has(x.id));if(!apps.length)return;let total=apps.reduce((s,a)=>s+Number(a.earnings||0),0);if(!confirm(`${apps.length} Positionen über ${cash(total)} abrechnen?`))return;invoices.push({id:Date.now(),date:localDate(new Date()),items:apps.map(a=>({appId:a.id,clientName:a.clientName,date:a.date,time:a.time,earnings:a.earnings})),total});apps.forEach(a=>a.billed=true);billingSelection.clear();persist()}
-function invoiceAction(id,action,itemId){let inv=invoices.find(x=>String(x.id)===String(id));if(!inv)return;if(action==='print')return printInvoice(inv);if(action==='delete'){if(!confirm('Abrechnung löschen und Positionen wieder öffnen?'))return;inv.items.forEach(item=>{let a=appointments.find(a=>a.id===item.appId);if(a)a.billed=false});invoices=invoices.filter(x=>x!==inv)}if(action==='removeItem'){if(!confirm('Position aus Abrechnung entfernen?'))return;inv.items=inv.items.filter(x=>x.appId!==itemId);let a=appointments.find(x=>x.id===itemId);if(a)a.billed=false;inv.total=inv.items.reduce((s,x)=>s+Number(x.earnings||0),0);if(!inv.items.length)invoices=invoices.filter(x=>x!==inv)}persist()}
-function printInvoice(inv){let content=`<div style="padding:35px;font-family:Arial"><h1>Abrechnungsübersicht #${esc(String(inv.id).slice(-6))}</h1><p>Erstellt am ${niceDate(inv.date)}</p><hr>${inv.items.map(x=>`<p>${esc(x.clientName)} · ${niceDate(x.date)} · ${esc(x.time)} Uhr (60 Min) — ${cash(x.earnings)}</p>`).join('')}<hr><h2>Gesamt: ${cash(inv.total)}</h2><p style="font-size:11px">Diese Übersicht ist keine steuerrechtlich vollständige Rechnung.</p></div>`;let p=$('print-area');p.innerHTML=content;p.style.display='block';window.print();setTimeout(()=>{p.innerHTML='';p.style.display='none'},1000)}
+function invoiceAction(id,action,itemId){let inv=invoices.find(x=>String(x.id)===String(id));if(!inv)return;if(action==='pdf')return downloadInvoicePDF(inv);if(action==='print')return printInvoice(inv);if(action==='delete'){if(!confirm('Abrechnung löschen und Positionen wieder öffnen?'))return;inv.items.forEach(item=>{let a=appointments.find(a=>a.id===item.appId);if(a)a.billed=false});invoices=invoices.filter(x=>x!==inv)}if(action==='removeItem'){if(!confirm('Position aus Abrechnung entfernen?'))return;inv.items=inv.items.filter(x=>x.appId!==itemId);let a=appointments.find(x=>x.id===itemId);if(a)a.billed=false;inv.total=inv.items.reduce((s,x)=>s+Number(x.earnings||0),0);if(!inv.items.length)invoices=invoices.filter(x=>x!==inv)}persist()}
+function printInvoice(inv){
+ const content=`<div class="invoice-print"><header><h1>PT Studio · Abrechnungsübersicht</h1><p>Abrechnung #${esc(String(inv.id).slice(-6))} · ${niceDate(inv.date)}</p></header><table><thead><tr><th>Leistung</th><th>Datum / Uhrzeit</th><th style="text-align:right">Honorar</th></tr></thead><tbody>${inv.items.map(item=>`<tr><td>${esc(item.clientName)}</td><td>${niceDate(item.date)} · ${esc(item.time)} Uhr · 60 Min.</td><td style="text-align:right">${cash(item.earnings)}</td></tr>`).join('')}</tbody></table><h2 style="text-align:right">Gesamt: ${cash(inv.total)}</h2><p class="invoice-disclaimer">Diese Übersicht ist keine steuerrechtlich vollständige Rechnung.</p></div>`;
+ const node=$('print-area');
+ node.innerHTML=content;
+ node.style.display='block';
+ const cleanup=()=>{node.style.display='none';node.innerHTML='';window.removeEventListener('afterprint',cleanup)};
+ window.addEventListener('afterprint',cleanup,{once:true});
+ try{window.print()}catch(error){cleanup();alert('Die Druckansicht wird in diesem Browser nicht unterstützt. Nutze „PDF speichern“.')}
+}
+
+/* Pure, offline PDF 1.4 generator, no network or external script required.
+   Text uses Helvetica with WinAnsiEncoding (German umlauts + EUR supported).
+   These are payment summaries, not tax-compliant invoices. */
+function pdfEsc(value){
+ const cp1252={8364:128,8218:130,402:131,8222:132,8230:133,8224:134,8225:135,
+ 710:136,8240:137,352:138,8249:139,338:140,381:142,8216:145,8217:146,
+ 8220:147,8221:148,8226:149,8211:150,8212:151,732:152,8482:153,353:154,
+ 8250:155,339:156,382:158,376:159};
+ let result='';
+ for(const ch of String(value??'')){
+  const unicode=ch.codePointAt(0);
+  if(ch==='\\'||ch==='('||ch===')'){result+='\\'+ch;continue}
+  if(unicode>=32&&unicode<=126){result+=ch;continue}
+  const byte=cp1252[unicode]??(unicode>=160&&unicode<=255?unicode:null);
+  result+=byte===null?'?':'\\'+byte.toString(8).padStart(3,'0');
+ }
+ return result;
+}
+function pdfDrawText(x,y,text,size=11,color=[0.15,0.14,0.13]){
+ return `${color.map(v=>Number(v).toFixed(3)).join(' ')} rg BT /F1 ${size} Tf 1 0 0 1 ${x} ${y} Tm (${pdfEsc(text)}) Tj ET\n`;
+}
+function pdfHorizontal(y){return `0.83 0.82 0.80 RG 0.6 w 52 ${y} m 543 ${y} l S\n`}
+function createInvoicePdfBlob(invoice){
+ const pages=[];
+ let commands='', y=0, pageIndex=0;
+ const walnut=[.42,.29,.20],dark=[.17,.16,.15],gray=[.48,.47,.45],teal=[0,.56,.54];
+ const newPage=()=>{
+  if(commands)pages.push(commands);
+  commands='';pageIndex++;y=778;
+  commands+=pdfDrawText(52,y,'PT STUDIO',13,walnut);
+  commands+=pdfDrawText(52,y-25,'Abrechnungsübersicht',21,dark);
+  commands+=pdfDrawText(52,y-48,`Abrechnung #${String(invoice.id).slice(-6)}  |  ${niceDate(invoice.date)}`,10,gray);
+  commands+=pdfHorizontal(y-61);
+  y-=91;
+  commands+=pdfDrawText(52,y,'KUNDE / LEISTUNG',10,gray);
+  commands+=pdfDrawText(300,y,'DATUM / UHRZEIT',10,gray);
+  commands+=pdfDrawText(475,y,'HONORAR',10,gray);
+  y-=15;commands+=pdfHorizontal(y);y-=26;
+ };
+ newPage();
+ for(const item of invoice.items){
+  if(y<116)newPage();
+  const fullName=String(item.clientName||'–');
+  const client=fullName.length>34?fullName.slice(0,32)+'…':fullName;
+  commands+=pdfDrawText(52,y,client,11,dark);
+  commands+=pdfDrawText(300,y,`${niceDate(item.date)}  ${item.time||''}`,10,gray);
+  commands+=pdfDrawText(465,y,cash(item.earnings),11,dark);
+  commands+=pdfDrawText(52,y-16,'Personal Training (60 Minuten)',9,gray);
+  commands+=pdfHorizontal(y-27);
+  y-=52;
+ }
+ if(y<108)newPage();
+ commands+=pdfDrawText(355,y-7,'GESAMT',11,gray);
+ commands+=pdfDrawText(465,y-7,cash(invoice.total),14,teal);
+ commands+=pdfDrawText(52,y-49,'Diese Übersicht ist keine steuerrechtlich vollständige Rechnung.',9,gray);
+ pages.push(commands);
+ const objs=['','',`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>`];
+ for(let i=0;i<pages.length;i++){
+  let pageNum=4+i*2,streamNum=5+i*2,stream=pages[i];
+  const footer=pdfDrawText(52,40,`PT Studio   |   Abrechnung ${String(invoice.id).slice(-6)}`,9,gray)+pdfDrawText(475,40,`Seite ${i+1}/${pages.length}`,9,gray);
+  stream+=footer;
+  objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents ${streamNum} 0 R >>`);
+  objs.push(`<< /Length ${stream.length} >>\nstream\n${stream}endstream`);
+ }
+ const kids=pages.map((_,i)=>`${4+i*2} 0 R`).join(' ');
+ objs[0]='<< /Type /Catalog /Pages 2 0 R >>';
+ objs[1]=`<< /Type /Pages /Count ${pages.length} /Kids [${kids}] >>`;
+ let pdf='%PDF-1.4\n%PTStudio\n',offsets=[0];
+ for(let i=0;i<objs.length;i++){
+  offsets.push(pdf.length);
+  pdf+=`${i+1} 0 obj\n${objs[i]}\nendobj\n`;
+ }
+ const xrefOffset=pdf.length;
+ pdf+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`;
+ for(let i=1;i<offsets.length;i++)pdf+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;
+ pdf+=`trailer\n<< /Size ${objs.length+1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+ return new Blob([pdf],{type:'application/pdf'});
+}
+function downloadInvoicePDF(inv){
+ try{
+  const pdfBlob=createInvoicePdfBlob(inv);
+  const url=URL.createObjectURL(pdfBlob);
+  const anchor=document.createElement('a');
+  anchor.href=url;
+  anchor.download=`PT_Abrechnung_${String(inv.id).replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
+  anchor.style.display='none';
+  document.body.appendChild(anchor);
+  anchor.click();anchor.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(e){console.error('PDF Export:',e);alert('PDF konnte nicht erstellt werden: '+e.message)}
+}
 function workoutFromLogbook(logbook){return(Array.isArray(logbook)?logbook:[]).map(e=>({ex:String(e.ex||''),isDetailed:!!e.isDetailed,kg:e.kg??'',rep:e.rep??'',sets:e.sets??'3',detailedSets:(Array.isArray(e.detailedSets)?e.detailedSets:[]).map(s=>({kg:s.kg??'',rep:s.rep??''}))}))}
 function setRows(e){return e.isDetailed?e.detailedSets:Array.from({length:Math.max(1,Math.min(30,parseInt(e.sets)||1))},()=>({kg:e.kg??'',rep:e.rep??''}))}
 function openTraining(id){let a=appointments.find(a=>a.id===id);if(!a)return;trainingAppId=id;workout=workoutFromLogbook(a.logbook);originalWorkout=JSON.stringify(workout);$('trainingTitle').textContent=a.clientName;$('trainingDate').textContent=`${niceDate(a.date)} · ${a.time} Uhr`;renderWorkout();show('trainingModal')}
@@ -1014,7 +1131,7 @@ $('leaveTraining').addEventListener('click',leaveTraining);$('saveTrainingBtn').
 $('trainingEntries').addEventListener('input',e=>{let field=e.target.dataset.field,card=e.target.closest('[data-ex]');if(!field||!card)return;let ex=workout[Number(card.dataset.ex)],set=e.target.closest('[data-set]');if(set&&ex.isDetailed){ex.detailedSets[Number(set.dataset.set)][field]=e.target.value}else ex[field]=e.target.value});
 $('trainingEntries').addEventListener('click',e=>{let b=e.target.closest('[data-exact]'),card=b?.closest('[data-ex]');if(b&&card)exerciseAction(Number(card.dataset.ex),b.dataset.exact,Number(b.closest('[data-set]')?.dataset.set))});
 $('pickerSearch').addEventListener('input',renderPicker);$('pickerList').addEventListener('click',e=>{let b=e.target.closest('[data-picker]'),item=b?.closest('[data-name]');if(b&&item)addExercise(decodeURIComponent(item.dataset.name))});$('customPickerBtn').addEventListener('click',()=>{let name=$('pickerSearch').value.trim()||prompt('Name der neuen Übung:');if(name)addExercise(name)});
-$('templateItems').addEventListener('click',e=>{let b=e.target.closest('[data-template]');if(!b||!confirm('Aktuelle Eingaben durch ausgewähltes Training ersetzen?'))return;let a=appointments.find(x=>x.id===b.dataset.template);workout=workoutFromLogbook(a?.logbook);hide('templateModal');renderWorkout()});
+$('templateItems').addEventListener('click',e=>{let b=e.target.closest('[data-template]');if(!b||!confirm('Aktuelle Eingaben durch ausgewähltes Training ersetzen?'))return;let a=appointments.find(x=>x.id===b.dataset.template);workout=normalizeWorkoutForOverlay(a?.logbook);hide('templateModal');renderWorkout()});
 $('historyContent').addEventListener('change',e=>{if(e.target.id==='historyClient'){historyFilter=e.target.value;renderHistory()}});
 $('copyBackupBtn').addEventListener('click',exportBackup);$('downloadBackupBtn').addEventListener('click',()=>download(JSON.stringify(backupObject(),null,2),`pt-backup-${localDate(new Date())}.json`,'application/json'));$('importBackupBtn').addEventListener('click',importBackup);
 
@@ -1028,7 +1145,7 @@ function normalizeWorkoutForOverlay(logbook){return (logbook||[]).map(entry=>{le
 function getExerciseRows(ex){if(!Array.isArray(ex.detailedSets))ex.detailedSets=[];return ex.detailedSets}
 function previousExerciseRows(name){let app=appointments.find(a=>a.id===trainingAppId);if(!app)return[];let previous=appointments.filter(a=>a.id!==app.id&&norm(a.clientName)===norm(app.clientName)&&(a.logbook||[]).some(e=>norm(e.ex)===norm(name))).sort((a,b)=>`${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`))[0];if(!previous)return[];let match=(previous.logbook||[]).find(e=>norm(e.ex)===norm(name));return setsOf(match||{}).map(s=>({kg:s.kg??'',rep:s.rep??''}))}
 function computeTrainingStats(){let done=0,vol=0;workout.forEach(ex=>getExerciseRows(ex).forEach(r=>{if(r.done){done++;vol+=(Number(r.kg)||0)*(Number(r.rep)||0)}}));return {done,volume:vol}}
-function updateTrainingStats(){let stats=computeTrainingStats();if($('trainingVolume'))$('trainingVolume').textContent=`${num(stats.volume,0)} kg`;if($('trainingSetCount'))$('trainingSetCount').textContent=String(stats.done);if($('trainingDuration'))$('trainingDuration').textContent=shortDurationLabel((Date.now()-trainingStartedAt)/1000||0)}
+function updateTrainingStats(){let stats=computeTrainingStats();if($('trainingVolume'))$('trainingVolume').textContent=`${Number(stats.volume||0).toLocaleString('de-DE',{maximumFractionDigits:1})} kg`;if($('trainingSetCount'))$('trainingSetCount').textContent=String(stats.done);if($('trainingDuration'))$('trainingDuration').textContent=shortDurationLabel((Date.now()-trainingStartedAt)/1000||0)}
 function startTrainingTicker(){stopTrainingTicker();trainingTicker=setInterval(updateTrainingStats,1000);updateTrainingStats()}
 function stopTrainingTicker(){if(trainingTicker){clearInterval(trainingTicker);trainingTicker=null}}
 function restProgressPct(){if(restTimer.mode==='stopwatch')return 100;let total=Math.max(1,restTimer.duration||1),remaining=Math.max(0,restTimer.remaining||0);return Math.max(0,Math.min(100,(remaining/total)*100))}
@@ -1044,17 +1161,17 @@ function toggleTimerStart(){if(restTimer.running){stopRestInterval();return}if(r
 function adjustTimer(seconds){if(restTimer.mode==='countdown'){restTimer.duration=Math.max(10,Math.round((restTimer.duration||0)+seconds));restTimer.remaining=Math.max(0,Math.round((restTimer.remaining||0)+seconds))}else{restTimer.remaining=Math.max(0,Math.round((restTimer.remaining||0)+seconds))}syncRestUi()}
 function setTimerMode(mode){restTimer.mode=mode==='stopwatch'?'stopwatch':'countdown';if(restTimer.mode==='stopwatch'){restTimer.remaining=restTimer.running?restTimer.remaining:0}else{if(restTimer.duration<10)restTimer.duration=180;if(restTimer.remaining===0)restTimer.remaining=restTimer.duration}syncRestUi()}
 openTraining=function(id){let a=appointments.find(x=>x.id===id);if(!a)return;trainingAppId=id;workout=normalizeWorkoutForOverlay(a.logbook);originalWorkout=JSON.stringify(workout);trainingStartedAt=Date.now();$('trainingTitle').textContent=a.clientName;$('trainingDate').textContent=`${niceDate(a.date)} · ${a.time} Uhr`;renderWorkout();startTrainingTicker();syncRestUi();show('trainingModal')}
-leaveTraining=function(){if(JSON.stringify(workout)!==originalWorkout&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;stopTrainingTicker();hide('trainingModal')}
+leaveTraining=function(){if(JSON.stringify(workout)!==originalWorkout&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;stopTrainingTicker();stopRestInterval();restTimer.remaining=restTimer.duration;hide('trainingModal')}
 renderWorkout=function(){let html=workout.map((e,i)=>{let prev=previousExerciseRows(e.ex);let rows=getExerciseRows(e);return `<article class="training-exercise" data-ex="${i}"><div class="training-ex-header"><div class="training-ex-main"><div class="training-ex-avatar">${esc(initials(e.ex))}</div><div class="training-ex-text"><input class="training-ex-name" data-field="ex" value="${esc(e.ex)}" aria-label="Übungsname"><div class="training-ex-subline"><button class="training-chip" data-exact="rest"><small>◷</small>Pause: ${Math.floor((e.restSeconds||180)/60)}min ${(e.restSeconds||180)%60}s</button><button class="training-chip" data-exact="note"><small>✎</small>${e.note?esc(e.note):'Notiz'}</button></div></div></div><div class="training-ex-tools"><button class="training-menu" data-exact="history">⋮</button><div class="training-util"><button data-exact="up">↑</button><button data-exact="down">↓</button><button data-exact="remove">✕</button></div></div></div><div class="training-variant">⌂ <span>${rows.length} Sätze</span> <small>Trainingslog</small></div><div class="hevy-grid-head"><span>SET</span><span>VORHERIGE</span><span>KG</span><span>WDH</span><span>✓</span></div>${rows.map((r,j)=>`<div class="hevy-grid-row ${r.done?'done':''}" data-set="${j}"><div class="hevy-set-no">${j+1}</div><div class="hevy-prev">${prev[j]?`${esc(prev[j].kg||'–')}kg x ${esc(prev[j].rep||'–')}`:'—'}</div><input class="hevy-input" type="number" min="0" step="any" data-field="kg" value="${esc(r.kg)}"><input class="hevy-input" type="number" min="0" step="1" data-field="rep" value="${esc(r.rep)}"><button class="hevy-check" data-exact="toggleDone">${r.done?'✓':'✓'}</button><button class="remove" style="display:none" data-exact="removeSet">×</button></div>`).join('')}<button class="training-set-add" data-exact="addSet">＋ Satz hinzufügen</button></article>`}).join('');$('trainingEntries').innerHTML=html||'<div class="empty">Noch keine Übungen. Tippe auf „Übung hinzufügen“.</div>';updateTrainingStats()}
 exerciseAction=function(i,action,setIndex){let e=workout[i];if(!e)return;let rows=getExerciseRows(e);if(action==='history')return showHistory(e.ex,true);if(action==='remove'){if(!confirm('Übung aus Training entfernen?'))return;workout.splice(i,1);renderWorkout();return}if(action==='up'&&i>0){[workout[i-1],workout[i]]=[workout[i],workout[i-1]];renderWorkout();return}if(action==='down'&&i<workout.length-1){[workout[i+1],workout[i]]=[workout[i],workout[i+1]];renderWorkout();return}if(action==='note'){let note=prompt('Notiz für diese Übung:',e.note||'');if(note===null)return;e.note=note;renderWorkout();return}if(action==='rest'){let minutes=prompt('Pause in Minuten (z. B. 3 oder 2.5):',String((e.restSeconds||180)/60).replace('.',','));if(minutes===null)return;let value=Number(String(minutes).replace(',','.'));if(!Number.isFinite(value)||value<=0)return alert('Ungültige Zeit.');e.restSeconds=Math.max(10,Math.round(value*60));renderWorkout();return}if(action==='addSet'){let last=rows[rows.length-1]||{kg:'',rep:'',done:false};rows.push({kg:last.kg,rep:last.rep,done:false});renderWorkout();return}if(action==='removeSet'){if(Number.isInteger(setIndex)&&setIndex>=0){rows.splice(setIndex,1);if(!rows.length)rows.push({kg:'',rep:'',done:false});renderWorkout()}return}if(action==='toggleDone'&&Number.isInteger(setIndex)&&setIndex>=0){rows[setIndex].done=!rows[setIndex].done;if(rows[setIndex].done)startRestTimer(e.restSeconds||180);renderWorkout();syncRestUi();return}}
 addExercise=function(name){if(!String(name).trim())return;workout.push({ex:name.trim(),isDetailed:true,detailedSets:[{kg:'',rep:'',done:false},{kg:'',rep:'',done:false}],restSeconds:180,note:''});hide('pickerModal');renderWorkout()}
-saveTraining=function(){let a=appointments.find(x=>x.id===trainingAppId);if(!a)return;let output=[];for(let e of workout){if(!String(e.ex||'').trim())continue;let rows=getExerciseRows(e);if(rows.some(s=>invalidWeight(s.kg)||invalidReps(s.rep)))return alert('Bitte gültige Gewichte und Wiederholungen eingeben.');output.push({ex:e.ex.trim(),isDetailed:true,kg:'',rep:'',sets:'',restSeconds:Number(e.restSeconds)||180,note:String(e.note||''),detailedSets:rows.map(s=>({kg:String(s.kg??''),rep:String(s.rep??''),done:!!s.done}))})}a.logbook=output;if(persist()){originalWorkout=JSON.stringify(workout);stopTrainingTicker();hide('trainingModal')}}
+saveTraining=function(){let a=appointments.find(x=>x.id===trainingAppId);if(!a)return;let output=[];for(let e of workout){if(!String(e.ex||'').trim())continue;let rows=getExerciseRows(e);if(rows.some(s=>invalidWeight(s.kg)||invalidReps(s.rep)))return alert('Bitte gültige Gewichte und Wiederholungen eingeben.');output.push({ex:e.ex.trim(),isDetailed:true,kg:'',rep:'',sets:'',restSeconds:Number(e.restSeconds)||180,note:String(e.note||''),detailedSets:rows.map(s=>({kg:String(s.kg??''),rep:String(s.rep??''),done:!!s.done}))})}a.logbook=output;if(persist()){originalWorkout=JSON.stringify(workout);stopTrainingTicker();stopRestInterval();restTimer.remaining=restTimer.duration;hide('trainingModal')}}
 // Timer controls and additional training listeners
 if($('openTimerBtn'))$('openTimerBtn').addEventListener('click',openRestTimerModal);
 if($('closeTimerBtn'))$('closeTimerBtn').addEventListener('click',closeRestTimerModal);
 if($('restMinusBtn'))$('restMinusBtn').addEventListener('click',()=>adjustTimer(-15));
 if($('restPlusBtn'))$('restPlusBtn').addEventListener('click',()=>adjustTimer(15));
-if($('restSkipBtn'))$('restSkipBtn').addEventListener('click',()=>{restTimer.remaining=0;stopRestInterval();syncRestUi()});
+if($('restSkipBtn'))$('restSkipBtn').addEventListener('click',()=>{restTimer.remaining=restTimer.duration;stopRestInterval();syncRestUi()});
 if($('timerMinus10Btn'))$('timerMinus10Btn').addEventListener('click',()=>adjustTimer(-10));
 if($('timerPlus10Btn'))$('timerPlus10Btn').addEventListener('click',()=>adjustTimer(10));
 if($('timerStartBtn'))$('timerStartBtn').addEventListener('click',toggleTimerStart);
