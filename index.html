@@ -4,7 +4,9 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
   <meta content="yes" name="apple-mobile-web-app-capable"/>
-  <meta content="#F1EEEA" name="theme-color"/>
+  <meta content="#EFECE8" name="theme-color"/>
+  <meta content="PT Studio" name="apple-mobile-web-app-title"/>
+  <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
   <title>
    PT Studio · Tracker
   </title>
@@ -827,6 +829,195 @@ body.has-active-workout{padding-bottom:calc(149px + env(safe-area-inset-bottom))
 }
 @media print{body{font-size:14px!important}}
 
+
+/* ======================================================================
+   PT Studio V8 · Walnut 60 / Brushed Silver 30 / Electric Teal 10
+   Refines only styling. No changes to saved data or application actions.
+   ====================================================================== */
+:root{
+ --walnut:#6B4A33;
+ --walnut-deep:#422C20;
+ --walnut-soft:#805D46;
+ --silver:#C9CCD0;
+ --silver-soft:#E9EBED;
+ --silver-deep:#AEB3B9;
+ --teal:#00C2B8;
+ --teal-deep:#008F88;
+ --teal-soft:#D9F5F1;
+ --bg:#EFECE8;
+ --surface:#F6F5F3;
+ --graphite:#3E2C21;
+ --muted:#7F7770;
+ --border:#D5D1CE;
+ --mist:#C9CCD0;
+ --coral:#00C2B8;
+ --pink:#E1F7F3;
+}
+html{min-height:100%;background:#EFECE8;color-scheme:light;overflow-x:hidden}
+body{
+ min-height:100vh;
+ min-height:100dvh;
+ overflow-x:hidden;
+ background:#EFECE8;
+ color:var(--walnut-deep);
+ -webkit-font-smoothing:antialiased;
+}
+body:before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#EFECE8;pointer-events:none;z-index:0}
+.view.active{min-height:100vh;min-height:100dvh;position:relative;background:#EFECE8}
+.view.active>.wrap{position:relative;isolation:isolate}
+/* A subtle warm header, without an abrupt beige-to-white cutoff. */
+#calendar .wrap:before,#billing .wrap:before{
+ content:"";position:absolute;z-index:-1;left:-20vw;right:-20vw;top:0;height:245px;
+ background:linear-gradient(180deg,#E9E0D7 0%,#EFECE8 94%);pointer-events:none
+}
+.eyebrow{color:#8B7A6D;letter-spacing:1.9px}
+.h1,.section-head h2{color:var(--walnut-deep);font-weight:800}
+.top{align-items:center}
+/* Header actions: neither oversized nor off-centre. */
+.header-icon-btn{
+ background:#E5E7E9!important;
+ border:1px solid #C9C9C7!important;
+ color:var(--walnut-deep)!important;
+ box-shadow:0 1px 3px rgba(52,39,28,.08)!important;
+}
+.header-icon-btn svg{stroke:var(--walnut-deep)}
+/* Walnut main canvas: deep warm solid with restrained silver metallic glint. */
+.hero{
+ background:linear-gradient(122deg,#5A3D2B 0%,#6B4A33 61%,#967966 100%);
+ border:1px solid #6E503F;
+ box-shadow:0 12px 28px rgba(63,38,20,.16);
+ color:#FFF9F4;
+ position:relative;
+ overflow:hidden;
+}
+.hero:after{content:"";position:absolute;right:-58px;top:-95px;width:190px;height:230px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,204,208,.23),rgba(201,204,208,0) 72%);pointer-events:none}
+.hero .sub,.hero .tiny,.hero .amount{color:#FFF8F1!important}
+.hero .amount{font-variant-numeric:tabular-nums}
+.hero .tiny{opacity:.86}
+/* Secondary surfaces are true brushed-silver tones, not pure white. */
+.card{
+ background:#F7F6F4;
+ border:1px solid #D6D2CF;
+ box-shadow:0 5px 18px rgba(69,44,26,.065);
+ backdrop-filter:none;
+}
+#appointments .ap-card{background:linear-gradient(145deg,#FAF9F6,#ECEEF0);border:1px solid #D6D4D0}
+.avatar,.lib-symbol{background:#DDE0E3;color:var(--walnut);border:1px solid #D6D9DC}
+.ap-card h3{color:var(--walnut-deep)}
+#appointments .ap-card .tiny{color:#80756D}
+#appointments .ap-card .link{color:var(--teal-deep)!important}
+#appointments .ap-card .status:not(.done){background:#DFE2E5;color:var(--walnut);font-weight:750}
+.status.done{background:#E3F1E8;color:#267959}
+.btn{background:var(--walnut);color:#fff;box-shadow:0 4px 12px rgba(107,74,51,.12)}
+.btn.secondary,.iconbutton{background:#E7E9EB;color:var(--walnut-deep);border-color:#CFD1D2;box-shadow:none}
+.btn.text{color:var(--walnut)!important}
+.btn:focus-visible,.tab:focus-visible,.day:focus-visible,.training-chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+/* Accent is reserved for time selection and small interactive markers. */
+.chip,.month-picker{background:#E4E6E8;color:var(--walnut-deep);border:1px solid #D4D5D6}
+.today-btn{background:var(--walnut);border-color:var(--walnut);color:#FFF8F3;box-shadow:none}
+.month-controls{flex-shrink:1}
+.days .day{background:#E8EAEC;border:1px solid #D4D6D8;box-shadow:0 3px 7px rgba(60,44,32,.045);color:var(--walnut)}
+.days .day b{color:var(--walnut)!important}
+.days .day small{color:#776E67}
+.days .day.active{background:var(--walnut)!important;border-color:var(--walnut)!important;box-shadow:0 0 0 1px rgba(107,74,51,.10);color:white!important}
+.days .day.active b{color:white!important}
+.days .day.active small{color:#F2E8E1!important}
+.days .day .dot{background:var(--teal)}
+.days .day.active .dot{background:var(--teal)}
+#dayLabel{background:#E3F5F1;border:1px solid rgba(0,194,184,.22);color:var(--teal-deep)}
+/* Full-width bottom dock extends through the safe area. */
+.nav{
+ background:#E1E3E5;
+ border-top:1px solid #C7C8C9;
+ box-shadow:0 -7px 26px rgba(62,46,32,.07);
+ padding-bottom:calc(7px + env(safe-area-inset-bottom,0px));
+ -webkit-backdrop-filter:none;
+ backdrop-filter:none;
+}
+.nav:after{content:"";position:absolute;top:100%;left:0;right:0;height:100px;background:#E1E3E5;pointer-events:none}
+.nav-two-tabs .tab{background:transparent;color:#746D66}
+.nav-two-tabs .tab.active{background:#CBCFD3!important;color:var(--walnut)!important;border:1px solid #BDC2C5}
+.nav-two-tabs .tab:not(.active){border:1px solid transparent}
+.nav-two-tabs .tab .ico{filter:saturate(.72)}
+.nav-two-tabs .tab.active .ico{filter:saturate(.82)}
+/* Tidy help text / footer leftovers. */
+.appointment-help{display:none!important}
+#calendar .wrap,#billing .wrap{padding-bottom:22px}
+/* Compact live-training notice remains visible, with walnut emphasis. */
+.active-workout-banner{background:#F2F2F0;border-color:#C6C8CA;box-shadow:0 8px 24px rgba(60,38,20,.13)}
+.active-workout-arrow{background:#E1E5E6;color:var(--walnut)}
+.active-workout-main strong{color:var(--walnut-deep)}
+.active-workout-status-dot{background:var(--teal)}
+.active-workout-time{background:#D9F4F0;color:var(--teal-deep)}
+/* Bills: neutral cards, walnut amounts, the teal used sparingly. */
+#billing #openItems .card{background:#F7F7F5;border-color:#D6D6D4}
+#billing #openItems .card strong{color:var(--walnut)}
+#billing #openItems .check{accent-color:var(--teal-deep)}
+#billing #invoices .card{background:#F6F6F4}
+.breakdown-sheet,.breakdown-head{background:#EFECE8}
+.breakdown-summary{background:linear-gradient(125deg,#593B2A,#6B4A33 82%)}
+.breakdown-chip{background:rgba(201,204,208,.19);color:#FAF5EE}
+.breakdown-client{background:#F7F7F5;border-color:#D7D6D2}
+.breakdown-avatar{background:#DCE0E2;color:var(--walnut)}
+.breakdown-position .value{color:var(--walnut)}
+.breakdown-go{background:var(--walnut);color:white}
+/* Workout: walnut typography, silver controls, teal as active accent. */
+.training-sheet,.training-shell{background:#F1EFEC!important;color:var(--walnut-deep)}
+.training-shell{background:#F1EFEC!important}
+.training-topbar{background:#E5E3E0;border-bottom:1px solid #D3D0CD;backdrop-filter:blur(10px)}
+.training-screen-title,.training-client{color:var(--walnut-deep)}
+.training-screen-sub{color:#7F766E}
+.training-circle-btn{background:#E3E6E8;border-color:#C9CBCE;color:var(--walnut-deep)}
+.training-stop-btn{background:var(--walnut);color:white}
+.training-stats-card{background:#E9EAEB;border-color:#D3D4D5}
+.training-stat span{color:#7C736B}
+.training-stat strong{color:var(--walnut-deep)}
+.body-dot{background:#B3B4B5}
+.body-dot.active{background:var(--teal)}
+.training-helper{display:none!important}
+.training-toolbar{display:flex;flex-direction:row!important;align-items:center!important;justify-content:space-between;gap:9px}
+.training-toolbar>div{flex:1;min-width:0}
+.training-client{font-size:18px;overflow-wrap:anywhere}
+.training-toolbar>.btn{flex:none;white-space:nowrap}
+.training-ex-avatar{background:#DBDEE0;color:var(--walnut)}
+.training-ex-name{color:var(--walnut)!important}
+.training-chip{background:#E2E4E6;color:#554638}
+.training-util button{background:#E1E3E6;color:#5A514C}
+.training-menu{color:var(--walnut)}
+.training-variant{color:#665348}
+.training-variant small{color:#978D86}
+.hevy-grid-head{color:#8B817A}
+.hevy-prev{color:#9B928E}
+.hevy-set-no,.hevy-check{background:#DEE0E2;color:var(--walnut)}
+.hevy-input{background:#F8F8F6;border-color:#CFD2D5;color:var(--walnut-deep)}
+.hevy-grid-row.done{background:#DDF4EF}
+.hevy-grid-row.done .hevy-check{background:var(--teal-deep);color:white}
+.hevy-grid-row.done .hevy-input,.hevy-grid-row.done .hevy-set-no{background:transparent}
+.training-set-add{background:#E0E2E4;color:var(--walnut-deep)}
+.training-add-exercise{background:var(--walnut);color:white}
+.training-rest-dock{background:#E8E9E9;border-top:1px solid #C9CBCD;box-shadow:0 -5px 20px rgba(49,39,29,.11)}
+.training-rest-progress{background:#CBD0D2}
+.training-rest-progress span{background:var(--teal)}
+.training-rest-time{color:var(--walnut-deep)}
+.training-rest-compact-info span{color:#81766D}
+.training-rest-btn{background:#D7DADD;color:var(--walnut)}
+.training-rest-btn.training-rest-skip{background:var(--walnut);color:white}
+.training-rest-collapse{color:var(--walnut)}
+.training-rest-mini{background:#E4E5E5;color:var(--walnut)}
+.timer-sheet{background:#EFECE8}
+.timer-ring{border-color:var(--teal)}
+.timer-ring-value{color:var(--walnut-deep)}
+.timer-tabs{background:#D5D9DB}
+.timer-side-btn{background:#E0E2E3;color:var(--walnut)}
+.timer-start-btn{background:var(--walnut);color:white}
+.pill{background:#E0F6F2;color:var(--teal-deep)}
+/* Print should never inherit the app background or fixed decorations. */
+@media print{
+ html,body,.view.active{background:white!important}
+ body:before,.nav:after,#calendar .wrap:before,#billing .wrap:before{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){.days,.nav,.training-rest-dock{scroll-behavior:auto}}
+
 </style>
  </head>
  <body>
@@ -889,7 +1080,6 @@ body.has-active-workout{padding-bottom:calc(149px + env(safe-area-inset-bottom))
     </div>
     <div class="stack" id="appointments">
     </div>
-    <div class="appointment-help">Tipp: Termin gedrückt halten, um ihn zu bearbeiten.</div>
    </div>
   </main>
   <main class="view" id="billing">
@@ -1063,7 +1253,6 @@ body.has-active-workout{padding-bottom:calc(149px + env(safe-area-inset-bottom))
      <div class="training-toolbar">
       <div>
        <div class="training-client" id="trainingTitle">Training</div>
-       <div class="training-helper">Hevy-inspirierte Trainingsansicht mit deinen PT-Daten</div>
       </div>
       <button class="btn secondary small" id="showTemplatesBtn">Training laden ↺</button>
      </div>
