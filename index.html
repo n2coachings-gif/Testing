@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
   <meta content="yes" name="apple-mobile-web-app-capable"/>
-  <meta content="#CCDCEF" name="theme-color"/>
+  <meta content="#F1EEEA" name="theme-color"/>
   <title>
    PT Studio · Tracker
   </title>
@@ -562,6 +562,71 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
  .invoice-print{box-shadow:none;max-width:none}
  .invoice-print tr{break-inside:avoid}
 }
+
+/* PT Studio v5: optimierte Kalender- und Abrechnungsoberfläche */
+.top>.row{gap:10px;align-items:center;justify-content:flex-end}
+.header-icon-btn{display:inline-flex!important;justify-content:center!important;align-items:center!important;flex:0 0 43px;width:43px!important;height:43px!important;min-width:43px!important;min-height:43px!important;padding:0!important;border:1px solid #DAD6D3!important;border-radius:15px!important;background:#EEF0F2!important;color:#4A3121!important;line-height:1!important;box-shadow:0 2px 4px #3c26100a!important;font-size:0!important}
+.header-icon-btn svg{display:block!important;width:19px;height:19px;max-width:19px;max-height:19px;flex:none;pointer-events:none}
+.month-controls{display:flex;align-items:center;gap:8px;min-width:0}
+.month-picker{position:relative;display:inline-flex;gap:5px;align-items:center;justify-content:center;min-height:39px;padding:9px 11px;white-space:nowrap;overflow:hidden;max-width:100%;cursor:pointer}
+.month-picker input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;font-size:16px}
+.month-picker svg{flex:none}
+.today-btn{border:1px solid rgba(0,156,148,.2);background:#E4F9F5;color:#008D86;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800;min-height:39px}
+#icsBtn{font-size:11px;max-width:48%;white-space:nowrap}
+.days{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding:9px 1px 14px;align-items:stretch;touch-action:pan-x;min-height:111px}
+.days::-webkit-scrollbar{display:none}
+.days .day{min-width:64px;width:64px;height:95px;flex-shrink:0;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(46,32,19,.035);border:1px solid #E0DAD4;background:#fff;padding:11px 5px;border-radius:19px;color:#6B4A33}
+.days .day b{font-size:22px;color:#168FDC;font-weight:780;line-height:1.15}
+.days .day small{font-size:11px;font-weight:700;color:#867C75}
+.days .day.active{background:#D7F6F1;border-color:#A3E5DF;box-shadow:0 0 0 1px #BCECE5;color:#008E87}
+.days .day.active b{color:#008F88}
+.days .day.active small{color:#008F88}
+.days .day .dot{background:#00C2B8;height:5px;width:5px;margin:0 auto;border-radius:50%}
+.days .day.active .dot{background:#008F88}
+.appointment-help{font-size:11px;color:#94887F;text-align:center;padding:14px 0 6px;letter-spacing:.01em}
+#appointments .ap-card{touch-action:pan-y;user-select:none;-webkit-user-select:none;position:relative;transition:box-shadow .18s,transform .18s}
+#appointments .ap-card.is-holding{transform:scale(.993);box-shadow:0 0 0 2px rgba(0,194,184,.24),0 8px 20px #1e344020}
+#appointments .ap-card button{-webkit-user-select:none;user-select:none}
+.nav-two-tabs{gap:12px;max-width:480px}
+.nav-two-tabs .tab{min-height:58px;padding:9px 15px;gap:3px;border-radius:16px}
+.nav-two-tabs .tab .ico{font-family:-apple-system,BlinkMacSystemFont,'Apple Color Emoji','Segoe UI Emoji',sans-serif;font-size:23px;line-height:1.25;display:grid;place-items:center;min-height:27px}
+.nav-two-tabs .tab>span:last-child{font-size:12px;font-weight:750}
+#billing #openItems .card{gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 4px 18px #3c26100b}
+#billing #openItems .card strong{font-size:14px}
+#billing #openItems .card .check{width:22px;height:22px;flex:none}
+#billing #openItems .card .grow{line-height:1.4}
+.breakdown-sheet{max-height:92dvh;background:#F5F2EF;border-radius:27px 27px 0 0;padding:24px 18px calc(26px + env(safe-area-inset-bottom));box-shadow:0 -15px 50px #17131029}
+.breakdown-head{position:relative;top:auto;padding-bottom:16px;background:#F5F2EF}
+.breakdown-head h2{font-size:23px;font-weight:800;letter-spacing:-.6px;color:#3B291D}
+.breakdown-close{border:1px solid #DED9D4;background:#fff;color:#514236;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:27px;line-height:1;font-weight:400;flex:none}
+.breakdown-summary{background:linear-gradient(120deg,#6B4A33,#8B6951);padding:19px;border-radius:22px;color:white;margin-bottom:17px}
+.breakdown-summary>.sub{color:#E9DBD0!important;font-size:12px;font-weight:650}
+.breakdown-summary .breakdown-amount{font-size:32px;color:white;letter-spacing:-1.2px;font-weight:850;margin:6px 0 14px}
+.breakdown-chips{display:flex;gap:8px;flex-wrap:wrap}
+.breakdown-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);padding:7px 11px;border-radius:99px;font-size:11px;font-weight:750;color:white}
+.breakdown-section-header{display:flex;align-items:center;justify-content:space-between;padding:3px 2px 11px;gap:8px}
+.breakdown-section-header strong{font-size:15px;color:#513828}
+.breakdown-section-header span{font-size:11px;color:#837A73}
+.breakdown-client{background:#fff;border:1px solid #E9E3DE;border-radius:18px;overflow:hidden;margin-bottom:10px;box-shadow:0 6px 16px #4a31210b}
+.breakdown-client summary{list-style:none;display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;min-height:69px}
+.breakdown-client summary::-webkit-details-marker{display:none}
+.breakdown-client summary:after{content:'⌄';font-size:23px;color:#888078;transform:rotate(0deg);transition:transform .15s}
+.breakdown-client[open] summary:after{transform:rotate(180deg)}
+.breakdown-avatar{width:39px;height:39px;border-radius:13px;background:#EEF0F2;color:#6B4A33;font-size:13px;font-weight:800;display:grid;place-items:center;flex:none}
+.breakdown-client-meta{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.breakdown-client-meta strong{font-size:14px;color:#4A3121;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.breakdown-client-meta small{font-size:11px;color:#868078}
+.breakdown-client-total{font-size:15px;font-weight:800;color:#6B4A33;white-space:nowrap}
+.breakdown-positions{padding:0 15px 10px;border-top:1px solid #F0ECE7}
+.breakdown-position{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F4F0ED}
+.breakdown-position:last-child{border-bottom:0}
+.breakdown-position .date{font-size:12px;font-weight:700;color:#574738}
+.breakdown-position .time{font-size:11px;color:#978F88;margin-top:3px}
+.breakdown-position .value{font-size:13px;color:#188F86;font-weight:800;white-space:nowrap}
+.breakdown-go{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;background:#00C2B8;border:0;border-radius:16px;color:white;font-size:14px;font-weight:800;padding:15px 12px;margin-top:18px}
+.breakdown-empty{background:#fff;border-radius:18px;padding:25px 16px;text-align:center;color:#7C746C;font-size:13px}
+@media(min-width:720px){.breakdown-sheet{border-radius:26px;max-width:590px;height:auto}}
+@media(max-width:360px){#icsBtn{font-size:10px;padding:9px 8px}.month-picker{padding:8px}.today-btn{padding:9px 8px}.days .day{min-width:60px;width:60px}.nav-two-tabs{gap:8px}}
 </style>
  </head>
  <body>
@@ -577,21 +642,23 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
       </h1>
      </div>
      <div class="row">
-      <button class="iconbutton" id="backupBtn" title="Datensicherung">
-       ⚙
+      <button class="iconbutton header-icon-btn" id="backupBtn" title="Datensicherung" aria-label="Datensicherung öffnen" type="button">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l-1.9 1.9a1.8 1.8 0 0 0-2-.35 8 8 0 0 1-1.3.55l-.5 2.35h-2.8l-.5-2.35a8 8 0 0 1-1.3-.55 1.8 1.8 0 0 0-2 .35L5.55 17a1.8 1.8 0 0 0 .35-2 8 8 0 0 1-.55-1.3L3 13.2v-2.8l2.35-.5a8 8 0 0 1 .55-1.3 1.8 1.8 0 0 0-.35-2L7.45 4.7a1.8 1.8 0 0 0 2 .35 8 8 0 0 1 1.3-.55l.5-2.35h2.8l.5 2.35a8 8 0 0 1 1.3.55 1.8 1.8 0 0 0 2-.35l1.9 1.9a1.8 1.8 0 0 0-.35 2 8 8 0 0 1 .55 1.3l2.35.5v2.8l-2.35.5a8 8 0 0 1-.55 1.3Z" transform="translate(-.7 -.2) scale(.97)"/></svg>
       </button>
-      <button class="iconbutton" id="newAppointment" title="Neuer Termin">
-       +
+      <button class="iconbutton header-icon-btn" id="newAppointment" title="Neuer Termin" aria-label="Neuen Termin erstellen" type="button">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
       </button>
      </div>
     </div>
     <div class="row between" style="margin-bottom:12px">
-     <label class="chip" style="position:relative">
-      <span id="monthLabel">
-      </span>
-      ▾
-      <input id="jumpDate" style="position:absolute;inset:0;opacity:0;width:100%" type="date"/>
-     </label>
+     <div class="month-controls">
+      <label class="chip month-picker" for="jumpDate" aria-label="Datum auswählen">
+       <span id="monthLabel"></span>
+       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+       <input id="jumpDate" type="date" aria-label="Datum im Kalender auswählen"/>
+      </label>
+      <button type="button" class="today-btn" id="todayBtn">Heute</button>
+     </div>
      <button class="btn secondary small" id="icsBtn">
       Kalender exportieren ↗
      </button>
@@ -622,6 +689,7 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
     </div>
     <div class="stack" id="appointments">
     </div>
+    <div class="appointment-help">Tipp: Termin gedrückt halten, um ihn zu bearbeiten.</div>
    </div>
   </main>
   <main class="view" id="billing">
@@ -697,26 +765,10 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
     </p>
    </div>
   </main>
-  <nav class="nav">
-   <div class="nav-inner">
-    <button class="tab active" data-tab="calendar">
-     <span class="ico">
-      ▦
-     </span>
-     Kalender
-    </button>
-    <button class="tab" data-tab="billing">
-     <span class="ico">
-      ▤
-     </span>
-     Abrechnung
-    </button>
-    <button class="tab" data-tab="library">
-     <span class="ico">
-      ◫
-     </span>
-     Übungen
-    </button>
+  <nav class="nav" aria-label="Hauptnavigation">
+   <div class="nav-inner nav-two-tabs">
+    <button class="tab active" data-tab="calendar" type="button"><span class="ico" aria-hidden="true">🗓️</span><span>Kalender</span></button>
+    <button class="tab" data-tab="billing" type="button"><span class="ico" aria-hidden="true">💰</span><span>Abrechnung</span></button>
    </div>
   </nav>
   <div class="overlay" id="appointmentModal">
@@ -897,6 +949,19 @@ body{background:linear-gradient(180deg,#F5F2EE 0%,#ECE6E0 100%);color:var(--grap
     </div>
    </section>
   </div>
+  <div class="overlay" id="breakdownModal" role="dialog" aria-modal="true" aria-labelledby="breakdownTitle">
+   <section class="sheet breakdown-sheet">
+    <div class="sheethead breakdown-head">
+     <div>
+      <div class="eyebrow">FINANZEN IM ÜBERBLICK</div>
+      <h2 id="breakdownTitle">Offene Stunden</h2>
+     </div>
+     <button class="breakdown-close" type="button" data-close="breakdownModal" aria-label="Übersicht schließen">×</button>
+    </div>
+    <div id="breakdownContent"></div>
+    <button class="breakdown-go" type="button" id="breakdownGoBilling">Zur Abrechnung <span aria-hidden="true">↗</span></button>
+   </section>
+  </div>
   <div class="overlay" id="transferModal">
    <section class="sheet">
     <div class="sheethead">
@@ -972,12 +1037,62 @@ function norm(s){return String(s||'').trim().toLocaleLowerCase('de-DE').replace(
 function show(id){$(id).classList.add('active')}
 function hide(id){$(id).classList.remove('active')}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(appointments));localStorage.setItem(IKEY,JSON.stringify(invoices));localStorage.setItem(DKEY,JSON.stringify(deletedAppIds));localStorage.setItem(LIBKEY,JSON.stringify(personalExercises));render();return true}catch(e){alert('Speichern fehlgeschlagen. Browser-Speicher prüfen und Daten sichern.');return false}}
+function showBreakdown(){
+  const open=openTotal().slice().sort((a,b)=>String(b.date+' '+b.time).localeCompare(String(a.date+' '+a.time)));
+  const sum=open.reduce((s,a)=>s+Number(a.earnings||0),0);
+  const groups=new Map();
+  open.forEach(a=>{
+    const name=String(a.clientName||'Unbekannt');
+    const key=norm(name);
+    if(!groups.has(key))groups.set(key,{name,items:[],sum:0});
+    const g=groups.get(key);g.items.push(a);g.sum+=Number(a.earnings||0);
+  });
+  const sorted=[...groups.values()].sort((a,b)=>b.sum-a.sum||a.name.localeCompare(b.name,'de'));
+  const content=`<div class="breakdown-summary"><div class="sub">Noch nicht abgerechnetes Honorar</div><div class="breakdown-amount">${cash(sum)}</div><div class="breakdown-chips"><span class="breakdown-chip">${open.length} ${open.length===1?'Stunde':'Stunden'}</span><span class="breakdown-chip">${groups.size} ${groups.size===1?'Kunde':'Kunden'}</span></div></div>`;
+  const sections=sorted.map((g,i)=>`<details class="breakdown-client" ${i===0?'open':''}><summary><span class="breakdown-avatar">${esc(g.name.trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase())}</span><span class="breakdown-client-meta"><strong>${esc(g.name)}</strong><small>${g.items.length} ${g.items.length===1?'Stunde':'Stunden'}</small></span><span class="breakdown-client-total">${cash(g.sum)}</span></summary><div class="breakdown-positions">${g.items.map(a=>`<div class="breakdown-position"><div><div class="date">${esc(niceDate(a.date,{weekday:'short',day:'2-digit',month:'short',year:'numeric'}))}</div><div class="time">${esc(a.time)} Uhr · 60 Minuten</div></div><div class="value">${cash(a.earnings)}</div></div>`).join('')}</div></details>`).join('');
+  $('breakdownContent').innerHTML=content+(sorted.length?`<div class="breakdown-section-header"><strong>Nach Kunden</strong><span>Aufklappen für alle Termine</span></div>${sections}`:'<div class="breakdown-empty">Aktuell sind keine abgeschlossenen, unabgerechneten Stunden vorhanden.</div>');
+  $('breakdownGoBilling').style.display=open.length?'flex':'none';
+  show('breakdownModal');
+}
 function openTotal(){return appointments.filter(a=>a.completed&&!a.billed)}
 function render(){renderCalendar();renderBilling();renderLibrary();$('clientSuggestions').innerHTML=[...new Set(appointments.map(a=>a.clientName).filter(Boolean))].map(n=>`<option value="${esc(n)}"></option>`).join('')}
-function renderCalendar(){const open=openTotal();$('calAmount').textContent=cash(open.reduce((v,a)=>v+Number(a.earnings||0),0));$('calCount').textContent=`${open.length} abgeschlossene Stunden`;$('monthLabel').textContent=niceDate(selectedDate,{month:'long',year:'numeric'});$('jumpDate').value=selectedDate;$('dayLabel').textContent=niceDate(selectedDate,{weekday:'short',day:'numeric',month:'short'});
-const start=dateObj(selectedDate);start.setDate(start.getDate()-3);let h='';for(let i=0;i<14;i++){let d=new Date(start);d.setDate(start.getDate()+i);let s=localDate(d);h+=`<button class="day ${s===selectedDate?'active':''}" data-day="${s}"><small>${esc(niceDate(s,{weekday:'short'}).replace('.','').toUpperCase())}</small><b>${d.getDate()}</b><span style="height:5px">${appointments.some(a=>a.date===s)?'<span class="dot" style="display:block"></span>':''}</span></button>`}$('days').innerHTML=h;
-let todays=appointments.filter(a=>a.date===selectedDate).sort((a,b)=>String(a.time).localeCompare(String(b.time)));
-$('appointments').innerHTML=todays.length?todays.map(a=>`<article class="card ap-card" data-id="${esc(a.id)}"><div class="avatar">${esc(a.clientName.slice(0,2).toUpperCase())}</div><div class="grow"><div class="tiny sub">${esc(a.time)} Uhr · ${cash(a.earnings)}</div><h3>${esc(a.clientName)}</h3><div class="row" style="gap:10px;flex-wrap:wrap"><button class="link" data-act="train">Training öffnen ↗</button><button class="link" data-act="edit">Bearbeiten</button><button class="link danger" data-act="delete">Löschen</button></div></div><button class="status ${a.completed?'done':''}" data-act="done">${a.billed?'Abgerechnet':a.completed?'Erledigt ✓':'Offen'}</button></article>`).join(''):'<div class="empty">Keine Termine an diesem Tag.</div>'}
+function focusSelectedDay(smooth=false){
+  requestAnimationFrame(()=>{
+    const strip=$('days'),target=strip?.querySelector('.day.active');
+    if(!strip||!target)return;
+    const sr=strip.getBoundingClientRect(),tr=target.getBoundingClientRect();
+    const left=strip.scrollLeft+(tr.left-sr.left)-(strip.clientWidth-target.clientWidth)/2;
+    strip.scrollTo({left:Math.max(0,left),behavior:smooth?'smooth':'auto'});
+  });
+}
+function setCalendarDate(date,smooth=true){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+  const test=dateObj(date);
+  if(!Number.isFinite(test.getTime())||localDate(test)!==date)return;
+  selectedDate=date;
+  renderCalendar(smooth);
+}
+function renderCalendar(smooth=false){
+  const open=openTotal();
+  $('calAmount').textContent=cash(open.reduce((v,a)=>v+Number(a.earnings||0),0));
+  $('calCount').textContent=`${open.length} abgeschlossene Stunden`;
+  $('monthLabel').textContent=niceDate(selectedDate,{month:'long',year:'numeric'});
+  $('jumpDate').value=selectedDate;
+  $('dayLabel').textContent=niceDate(selectedDate,{weekday:'short',day:'numeric',month:'short'});
+  const start=dateObj(selectedDate);start.setDate(start.getDate()-14);
+  const counts=new Set(appointments.map(a=>a.date));
+  let h='';
+  for(let i=0;i<35;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const date=localDate(d);
+    const hasAppointments=counts.has(date);
+    h+=`<button class="day ${date===selectedDate?'active':''}" type="button" data-day="${date}" aria-pressed="${date===selectedDate}" aria-label="${esc(niceDate(date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}"><small>${esc(niceDate(date,{weekday:'short'}).replace('.','').toUpperCase())}</small><b>${d.getDate()}</b><span style="height:5px">${hasAppointments?'<span class="dot" style="display:block"></span>':''}</span></button>`;
+  }
+  $('days').innerHTML=h;
+  const todays=appointments.filter(a=>a.date===selectedDate).sort((a,b)=>String(a.time).localeCompare(String(b.time)));
+  $('appointments').innerHTML=todays.length?todays.map(a=>`<article class="card ap-card" data-id="${esc(a.id)}"><div class="avatar">${esc(a.clientName.slice(0,2).toUpperCase())}</div><div class="grow"><div class="tiny sub">${esc(a.time)} Uhr · ${cash(a.earnings)}</div><h3>${esc(a.clientName)}</h3><div class="row" style="gap:10px;flex-wrap:wrap"><button class="link" data-act="train">Training öffnen ↗</button><button class="link" data-act="edit">Bearbeiten</button><button class="link danger" data-act="delete">Löschen</button></div></div><button class="status ${a.completed?'done':''}" data-act="done">${a.billed?'Abgerechnet':a.completed?'Erledigt ✓':'Offen'}</button></article>`).join(''):'<div class="empty">Keine Termine an diesem Tag.</div>';
+  focusSelectedDay(smooth);
+}
 function renderBilling(){const open=openTotal(),ids=new Set(open.map(a=>a.id));billingSelection=new Set([...billingSelection].filter(id=>ids.has(id)));$('billAmount').textContent=cash(open.reduce((v,a)=>v+Number(a.earnings||0),0));$('billCount').textContent=`${open.length} Stunden`;$('openItems').innerHTML=open.length?open.map(a=>`<div class="card row"><input class="check" type="checkbox" data-bill="${esc(a.id)}" ${billingSelection.has(a.id)?'checked':''}><div class="grow"><strong>${esc(a.clientName)}</strong><div class="sub">${niceDate(a.date)} · ${esc(a.time)} Uhr</div></div><strong>${cash(a.earnings)}</strong></div>`).join(''):'<div class="empty">Keine offenen Posten vorhanden.</div>';$('invoiceButton').disabled=!billingSelection.size;$('invoiceButton').textContent=`${billingSelection.size} abrechnen`;
 $('invoices').innerHTML=[...invoices].reverse().map(inv=>`<div class="card" data-invoice="${esc(inv.id)}"><div class="row between"><div><strong>Abrechnung #${esc(String(inv.id).slice(-6))}</strong><div class="sub">${niceDate(inv.date)} · ${inv.items.length} Positionen</div></div><strong>${cash(inv.total)}</strong></div><div class="divider"></div>${inv.items.map(item=>`<div class="row between" style="margin:8px 0"><span class="tiny">${esc(item.clientName)} · ${niceDate(item.date)}</span><span class="tiny">${cash(item.earnings)} <button class="remove" data-invact="removeItem" data-item="${esc(item.appId)}">×</button></span></div>`).join('')}<div class="actions"><button class="btn secondary small" data-invact="pdf">PDF speichern</button><button class="btn secondary small" data-invact="print">Drucken</button><button class="btn text small danger" data-invact="delete">Löschen</button></div></div>`).join('')||'<div class="empty">Noch keine Abrechnungen erstellt.</div>'}
 function catalog(){let m=new Map();personalExercises.filter(n=>typeof n==='string'&&norm(n)).forEach(name=>m.set(norm(name),{name,manual:true,sessions:0,clients:new Set()}));appointments.forEach(a=>(Array.isArray(a.logbook)?a.logbook:[]).forEach(e=>{if(!norm(e.ex))return;let k=norm(e.ex),v=m.get(k)||{name:e.ex,manual:false,sessions:0,clients:new Set()};v.sessions++;v.clients.add(a.clientName);m.set(k,v)}));return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name,'de'))}
@@ -1119,10 +1234,40 @@ function exportICS(){let stamp=new Date().toISOString().replace(/[-:]/g,'').repl
 // Event delegation avoids fragile inline JavaScript attributes and makes all controls work after rerender.
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===b.dataset.tab));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));render()}));
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hide(b.dataset.close)));
-document.querySelectorAll('[data-action="breakdown"]').forEach(b=>b.addEventListener('click',()=>{let a=openTotal();alert(a.length?a.map(x=>`${niceDate(x.date)} · ${x.clientName} · ${cash(x.earnings)}`).join('\n'):'Keine offenen Honorare.')}));
-$('newAppointment').addEventListener('click',()=>openAppointment());$('backupBtn').addEventListener('click',()=>{$('backupText').value='';show('transferModal')});$('jumpDate').addEventListener('change',e=>{if(e.target.value){selectedDate=e.target.value;renderCalendar()}});$('icsBtn').addEventListener('click',exportICS);
-$('days').addEventListener('click',e=>{let b=e.target.closest('[data-day]');if(b){selectedDate=b.dataset.day;renderCalendar()}});
+document.querySelectorAll('[data-action="breakdown"]').forEach(b=>b.addEventListener('click',showBreakdown));
+$('newAppointment').addEventListener('click',()=>openAppointment());$('backupBtn').addEventListener('click',()=>{$('backupText').value='';show('transferModal')});$('jumpDate').addEventListener('change',e=>{if(e.target.value)setCalendarDate(e.target.value)});$('todayBtn').addEventListener('click',()=>setCalendarDate(localDate(new Date())));$('icsBtn').addEventListener('click',exportICS);
+$('days').addEventListener('click',e=>{let b=e.target.closest('[data-day]');if(b)setCalendarDate(b.dataset.day)});
 $('appointments').addEventListener('click',e=>{let b=e.target.closest('[data-act]'),card=b?.closest('[data-id]');if(b&&card)handleAppointment(card.dataset.id,b.dataset.act)});
+
+$('breakdownGoBilling').addEventListener('click',()=>{
+  hide('breakdownModal');
+  document.querySelector('.tab[data-tab="billing"]').click();
+});
+// Hold-to-edit on appointment cards: works with touch, pen and mouse, while preserving normal buttons.
+(function initHoldToEdit(){
+  const list=$('appointments');
+  let timer=null,card=null,x=0,y=0,activePointer=null;
+  function cancel(){if(timer!==null){clearTimeout(timer);timer=null}if(card)card.classList.remove('is-holding');card=null;activePointer=null}
+  list.addEventListener('pointerdown',e=>{
+    const target=e.target.closest('.ap-card');
+    if(!target||e.target.closest('button,a,input,select,textarea')||e.button>0)return;
+    cancel();card=target;activePointer=e.pointerId;x=e.clientX;y=e.clientY;
+    card.classList.add('is-holding');
+    timer=setTimeout(()=>{
+      timer=null;
+      const id=card?.dataset.id;
+      if(!id)return;
+      if(navigator.vibrate)navigator.vibrate(12);
+      cancel();
+      openAppointment(id);
+    },650);
+  },{passive:true});
+  list.addEventListener('pointermove',e=>{if(card&&e.pointerId===activePointer&&(Math.abs(e.clientX-x)>12||Math.abs(e.clientY-y)>12))cancel()},{passive:true});
+  list.addEventListener('pointerup',cancel,{passive:true});
+  list.addEventListener('pointercancel',cancel,{passive:true});
+  list.addEventListener('contextmenu',e=>{if(e.target.closest('.ap-card')&&!e.target.closest('button'))e.preventDefault()});
+})();
+
 $('client').addEventListener('input',suggestFee);$('appFee').addEventListener('input',()=>feeManual=true);$('saveAppBtn').addEventListener('click',saveAppointment);
 $('invoiceButton').addEventListener('click',createInvoice);$('openItems').addEventListener('change',e=>{if(e.target.matches('[data-bill]')){if(e.target.checked)billingSelection.add(e.target.dataset.bill);else billingSelection.delete(e.target.dataset.bill);$('invoiceButton').disabled=!billingSelection.size;$('invoiceButton').textContent=`${billingSelection.size} abrechnen`}});
 $('invoices').addEventListener('click',e=>{let b=e.target.closest('[data-invact]'),inv=b?.closest('[data-invoice]');if(b&&inv)invoiceAction(inv.dataset.invoice,b.dataset.invact,b.dataset.item)});
